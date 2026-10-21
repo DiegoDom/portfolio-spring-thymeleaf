@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,6 +55,18 @@ public class SkillTestController {
     if (skill.isPresent()) {
       skillService.deleteById(id);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } else {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found with id: " + id);
+    }
+  }
+
+  @PutMapping("{id}")
+  public ResponseEntity<Skill> update(@PathVariable Long id, @RequestBody Skill skill) {
+    Optional<Skill> existingSkill = skillService.findById(id);
+    if (existingSkill.isPresent()) {
+      skill.setId(id);
+      Skill updatedSkill = skillService.save(skill);
+      return new ResponseEntity<>(updatedSkill, HttpStatus.OK);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found with id: " + id);
     }

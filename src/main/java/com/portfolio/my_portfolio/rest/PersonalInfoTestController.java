@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,18 @@ public class PersonalInfoTestController {
     if (personalInfo.isPresent()) {
       personalInfoService.deleteById(id);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } else {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PersonalInfo not found with id: " + id);
+    }
+  }
+
+  @PutMapping("{id}")
+  public ResponseEntity<PersonalInfo> update(@PathVariable Long id, @RequestBody PersonalInfo personalInfo) {
+    Optional<PersonalInfo> existingPersonalInfo = personalInfoService.findById(id);
+    if (existingPersonalInfo.isPresent()) {
+      personalInfo.setId(id);
+      PersonalInfo updatedPersonalInfo = personalInfoService.save(personalInfo);
+      return new ResponseEntity<>(updatedPersonalInfo, HttpStatus.OK);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PersonalInfo not found with id: " + id);
     }
