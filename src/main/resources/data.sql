@@ -17,3 +17,7 @@ INSERT INTO educations (degree, institution, start_date, end_date, description, 
 INSERT INTO experiences (job_title, company_name, start_date, end_date, description, personal_info_id) VALUES
 ('Desarrollador Full Stack Senior', 'Tech Solutions S.A.', '2022-01-01', NULL, 'Desarrollo y mantenimiento de aplicaciones empresariales. Liderazgo técnico de equipo de 3 personas.', 1),
 ('Desarrollador Backend Junior', 'Innovatech Labs', '2020-09-01', '2021-12-31', 'Participación en el desarrollo de APIs RESTful y optimización de bases de datos.', 1);
+
+INSERT INTO projects (title, description, image_url, personal_info_id) VALUES
+('Portfolio Personal', 'Desarrollo de un portfolio personal utilizando React y Spring Boot para mostrar proyectos y habilidades.', 'img/portfolio-project.jpg', 1),
+('Sistema de Gestión de Inventarios', 'Aplicación web para la gestión de inventarios en tiempo real, con integración a bases de datos PostgreSQL.', 'img/inventory-system.jpg', 1);
