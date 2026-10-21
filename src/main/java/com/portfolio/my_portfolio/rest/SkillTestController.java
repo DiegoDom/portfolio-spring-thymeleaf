@@ -15,25 +15,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.portfolio.my_portfolio.model.Skill;
-import com.portfolio.my_portfolio.repository.SkillRepositoryImpl;
+import com.portfolio.my_portfolio.service.SkillServiceImpl;
 
 @RestController
 @RequestMapping("/api/test/skills")
 public class SkillTestController {
-  private final SkillRepositoryImpl skillRepository;
+  private final SkillServiceImpl skillService;
 
-  public SkillTestController(SkillRepositoryImpl skillRepository) {
-    this.skillRepository = skillRepository;
+  public SkillTestController(SkillServiceImpl skillService) {
+    this.skillService = skillService;
   }
 
   @GetMapping("/all")
   public List<Skill> findAll() {
-    return skillRepository.findAll();
+    return skillService.findAll();
   }
 
   @GetMapping("{id}")
   public Skill findById(@PathVariable Long id) {
-    Optional<Skill> skill = skillRepository.findById(id);
+    Optional<Skill> skill = skillService.findById(id);
 
     if (skill.isPresent()) {
       return skill.get();
@@ -44,15 +44,15 @@ public class SkillTestController {
 
   @PostMapping()
   public ResponseEntity<Skill> create(@RequestBody Skill skill) {
-    Skill savedSkill = skillRepository.save(skill);
+    Skill savedSkill = skillService.save(skill);
     return new ResponseEntity<>(savedSkill, HttpStatus.CREATED);
   }
 
   @DeleteMapping("{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
-    Optional<Skill> skill = skillRepository.findById(id);
+    Optional<Skill> skill = skillService.findById(id);
     if (skill.isPresent()) {
-      skillRepository.deleteById(id);
+      skillService.deleteById(id);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found with id: " + id);

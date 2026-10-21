@@ -15,25 +15,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.portfolio.my_portfolio.model.Experience;
-import com.portfolio.my_portfolio.repository.ExperienceRepositoryImpl;
+import com.portfolio.my_portfolio.service.ExperienceServiceImpl;
 
 @RestController
 @RequestMapping("/api/test/experiences")
 public class ExperiencesTestController {
-  private final ExperienceRepositoryImpl experienceRepository;
+  private final ExperienceServiceImpl experienceService;
 
-  public ExperiencesTestController(ExperienceRepositoryImpl experienceRepository) {
-    this.experienceRepository = experienceRepository;
+  public ExperiencesTestController(ExperienceServiceImpl experienceService) {
+    this.experienceService = experienceService;
   }
 
   @GetMapping("/all")
   public List<Experience> findAll() {
-    return experienceRepository.findAll();
+    return experienceService.findAll();
   }
 
   @GetMapping("{id}")
   public Experience findById(@PathVariable Long id) {
-    Optional<Experience> experience = experienceRepository.findById(id);
+    Optional<Experience> experience = experienceService.findById(id);
 
     if (experience.isPresent()) {
       return experience.get();
@@ -44,15 +44,15 @@ public class ExperiencesTestController {
 
   @PostMapping()
   public ResponseEntity<Experience> create(@RequestBody Experience experience) {
-    Experience savedExperience = experienceRepository.save(experience);
+    Experience savedExperience = experienceService.save(experience);
     return new ResponseEntity<>(savedExperience, HttpStatus.CREATED);
   }
 
   @DeleteMapping("{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
-    Optional<Experience> experience = experienceRepository.findById(id);
+    Optional<Experience> experience = experienceService.findById(id);
     if (experience.isPresent()) {
-      experienceRepository.deleteById(id);
+      experienceService.deleteById(id);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience not found with id: " + id);

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.portfolio.my_portfolio.service.PersonalInfoServiceImpl;
 import com.portfolio.my_portfolio.model.PersonalInfo;
+import com.portfolio.my_portfolio.service.PersonalInfoServiceImpl;
 
 @RestController
 @RequestMapping("/api/test/personal-info")

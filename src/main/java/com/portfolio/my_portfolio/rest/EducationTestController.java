@@ -15,25 +15,25 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.portfolio.my_portfolio.model.Education;
-import com.portfolio.my_portfolio.repository.EducationRepositoryImpl;
+import com.portfolio.my_portfolio.service.EducationServiceImpl;
 
 @RestController
 @RequestMapping("/api/test/educations")
 public class EducationTestController {
-  private final EducationRepositoryImpl educationRepository;
+  private final EducationServiceImpl educationService;
 
-  public EducationTestController(EducationRepositoryImpl educationRepository) {
-    this.educationRepository = educationRepository;
+  public EducationTestController(EducationServiceImpl educationService) {
+    this.educationService = educationService;
   }
 
   @GetMapping("/all")
   public List<Education> findAll() {
-    return educationRepository.findAll();
+    return educationService.findAll();
   }
 
   @GetMapping("{id}")
   public Education findById(@PathVariable Long id) {
-    Optional<Education> education = educationRepository.findById(id);
+    Optional<Education> education = educationService.findById(id);
 
     if (education.isPresent()) {
       return education.get();
@@ -44,15 +44,15 @@ public class EducationTestController {
 
   @PostMapping()
   public ResponseEntity<Education> create(@RequestBody Education education) {
-    Education savedEducation = educationRepository.save(education);
+    Education savedEducation = educationService.save(education);
     return new ResponseEntity<>(savedEducation, HttpStatus.CREATED);
   }
 
   @DeleteMapping("{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
-    Optional<Education> education = educationRepository.findById(id);
+    Optional<Education> education = educationService.findById(id);
     if (education.isPresent()) {
-      educationRepository.deleteById(id);
+      educationService.deleteById(id);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Education not found with id: " + id);
