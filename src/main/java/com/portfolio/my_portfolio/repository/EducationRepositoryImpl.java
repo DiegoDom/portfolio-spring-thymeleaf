@@ -43,8 +43,8 @@ public class EducationRepositoryImpl implements IEducationRepository {
       KeyHolder keyHolder = new GeneratedKeyHolder();
       jdbcTemplate.update(connection -> {
         PreparedStatement ps = connection.prepareStatement(sqlString, new String[] { "id" });
-        ps.setString(2, education.getDegree());
         ps.setString(1, education.getInstitution());
+        ps.setString(2, education.getDegree());
         ps.setObject(3, education.getStartDate());
         ps.setObject(4, education.getEndDate());
         ps.setString(5, education.getDescription());
@@ -60,7 +60,7 @@ public class EducationRepositoryImpl implements IEducationRepository {
     } else {
       String sqlString = "UPDATE " + TABLE_NAME
           + " SET institution = ?, degree = ?, start_date = ?, end_date = ?, description = ?, personal_info_id = ? WHERE id = ?";
-      jdbcTemplate.update(sqlString, education.getDegree(), education.getInstitution(), education.getStartDate(),
+      jdbcTemplate.update(sqlString, education.getInstitution(), education.getDegree(), education.getStartDate(),
           education.getEndDate(), education.getDescription(), education.getPersonalInfoId(), education.getId());
     }
     return education;

@@ -30,10 +30,9 @@ docker compose ps         # wait for "healthy"
 3. **`spring.jpa.properties.hibernate.dialect` in `application.properties` is dead config** — no JPA/Hibernate dependency exists. `README.md`'s config table is stale about this (it still lists `spring.jpa.hibernate.ddl-auto` / `spring.jpa.show-sql`, already removed); trust `application.properties` over the README.
 4. **Row mapping is manual.** Adding/renaming a column means editing `src/main/resources/schema.sql` *and* the `RowMapper` in the matching `*RepositoryImpl` (snake_case -> camelCase). Nothing is regenerated.
 5. **`save()` is insert-or-update keyed on `id == null`.** A POST body carrying an `id` updates that row instead of inserting. Inserts use `GeneratedKeyHolder` with `new String[]{"id"}` to read the generated key.
-6. **SQL parameters are positional** — the argument order of `jdbcTemplate.update(...)` / `ps.setX(n, ...)` must match the column order of the statement, and that order differs per entity (`educations` lists `institution, degree`; `data.sql` lists `degree, institution`). Do not reorder one side alone.
-7. **Known live bug:** the working-tree `EducationRepositoryImpl.save()` UPDATE binds `(degree, institution)` while its `SET` clause is `institution = ?, degree = ?`, so an education update swaps the two columns. Verified by API round-trip. Fix by swapping the two arguments back.
-8. **Repository `deleteById` silently succeeds for a missing id.** The 404 is produced in the controller by calling `findById` first — keep that check when adding endpoints.
-9. **Lombok is required to compile** (`optional` dependency, but the compiler plugin pins the annotation processor path). If getters/setters are missing at compile time, annotation processing is not active (IDE: enable it).
+6. **SQL parameters are positional** — the argument order of `jdbcTemplate.update(...)` / `ps.setX(n, ...)` must match the column order of the statement, and that order differs per entity (`educations` lists `institution, degree`; `data.sql` lists `degree, institution`). Do not reorder one side alone. `EducationRepositoryImpl` was once caught swapping `degree`/`institution` on UPDATE (SET clause vs. bound args); it is fixed now — keep both the INSERT column list and the UPDATE `SET` clause in `institution, degree` order and bind them the same way. All five repositories were audited after the fix; only educations was affected.
+7. **Repository `deleteById` silently succeeds for a missing id.** The 404 is produced in the controller by calling `findById` first — keep that check when adding endpoints.
+8. **Lombok is required to compile** (`optional` dependency, but the compiler plugin pins the annotation processor path). If getters/setters are missing at compile time, annotation processing is not active (IDE: enable it).
 
 ## Conventions to match
 
@@ -43,6 +42,7 @@ docker compose ps         # wait for "healthy"
 - Models are Lombok `@Data @AllArgsConstructor @NoArgsConstructor` POJOs and are exposed directly as the API contract — no DTOs, no Bean Validation (NOT NULL is enforced by Postgres).
 - Missing records are reported with `ResponseStatusException(HttpStatus.NOT_FOUND, ...)`.
 - Controllers are named `*TestController` and mounted under `/api/test/...` — that "Test" is scaffolding, **not** JUnit. Base paths: `/api/test/{personal-info,skills,educations,experiences,projects}`, each exposing `GET /all`, `GET /{id}`, `POST /`, `DELETE /{id}`.
+- `POST` is mapped to the path **without** a trailing slash: `/api/test/educations/` 404s (Spring Boot 4 falls through to the static-resource handler) while `/api/test/educations` returns 201.
 - Indentation is mixed (2-space in most files, 4-space in the `PersonalInfo*` files) and there is no formatter config — match the file you edit.
 
 ## Known gaps (do not assume they are implemented)
