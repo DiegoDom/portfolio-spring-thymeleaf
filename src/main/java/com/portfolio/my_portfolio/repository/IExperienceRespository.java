@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import com.portfolio.my_portfolio.model.Experience;
 
-public interface IExperienceRespositoryImpl {
+public interface IExperienceRespository {
   Experience save(Experience experience);
 
   Optional<Experience> findById(Long id);

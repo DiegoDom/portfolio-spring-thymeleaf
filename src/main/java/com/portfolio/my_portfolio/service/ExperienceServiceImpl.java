@@ -3,9 +3,12 @@ package com.portfolio.my_portfolio.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.portfolio.my_portfolio.model.Experience;
 import com.portfolio.my_portfolio.repository.ExperienceRepositoryImpl;
 
+@Service
 public class ExperienceServiceImpl implements IExperiencesService {
   private final ExperienceRepositoryImpl experienceRepository;
 

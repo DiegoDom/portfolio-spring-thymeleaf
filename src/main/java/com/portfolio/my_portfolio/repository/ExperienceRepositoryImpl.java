@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class ExperienceRepositoryImpl implements IExperienceRespositoryImpl {
+public class ExperienceRepositoryImpl implements IExperienceRespository {
 
   private final String TABLE_NAME = "experiences";
   private final JdbcTemplate jdbcTemplate;

@@ -3,9 +3,12 @@ package com.portfolio.my_portfolio.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
 import com.portfolio.my_portfolio.model.Education;
 import com.portfolio.my_portfolio.repository.EducationRepositoryImpl;
 
+@Service
 public class EducationServiceImpl implements IEducationService {
   private final EducationRepositoryImpl educationRepository;
 
