@@ -35,19 +35,19 @@ public class PersonalInfoRepositoryImpl implements IPersonalInfoRepository {
         info.setLinkedinUrl(rs.getString("linkedin_url"));
         info.setGithubUrl(rs.getString("github_url"));
 
-        return  info;
+        return info;
     };
 
     @Override
     public PersonalInfo save(PersonalInfo personalInfo) {
-        if(personalInfo.getId() == null) {
+        if (personalInfo.getId() == null) {
             String sqlString = "INSERT INTO " + TABLE_NAME + " (first_name, last_name, title, profile_description, " +
                     "profile_image_url, years_of_experience, email, phone, linkedin_url, github_url) " +
                     "VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             KeyHolder keyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement ps = connection.prepareStatement(sqlString, new String[] { "id" });
                 ps.setString(1, personalInfo.getFirstName());
                 ps.setString(2, personalInfo.getLastName());
                 ps.setString(3, personalInfo.getTitle());
@@ -65,10 +65,15 @@ public class PersonalInfoRepositoryImpl implements IPersonalInfoRepository {
                 return ps;
             }, keyHolder);
 
-            personalInfo.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+            Number generatedId = Objects.requireNonNull(
+                    keyHolder.getKey(),
+                    "The database did not return a generated ID");
+
+            personalInfo.setId(generatedId.longValue());
 
         } else {
-            String sqlString = "UPDATE " + TABLE_NAME + " SET first_name = ?, last_name = ?, title = ?, profile_description = ?, " +
+            String sqlString = "UPDATE " + TABLE_NAME
+                    + " SET first_name = ?, last_name = ?, title = ?, profile_description = ?, " +
                     "profile_image_url = ?, years_of_experience = ?, email = ?, phone = ?, linkedin_url = ?, github_url = ? WHERE id = ?";
             jdbcTemplate.update(sqlString,
                     personalInfo.getFirstName(),
@@ -81,8 +86,7 @@ public class PersonalInfoRepositoryImpl implements IPersonalInfoRepository {
                     personalInfo.getPhone(),
                     personalInfo.getLinkedinUrl(),
                     personalInfo.getGithubUrl(),
-                    personalInfo.getId()
-                    );
+                    personalInfo.getId());
         }
         return personalInfo;
     }
@@ -90,12 +94,14 @@ public class PersonalInfoRepositoryImpl implements IPersonalInfoRepository {
     @Override
     public Optional<PersonalInfo> findById(Long id) {
         String queryString = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
-        /* 
-        List<PersonalInfo> results = jdbcTemplate.query(queryString, personalInfoRowMapper, id);
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0)); */
+        /*
+         * List<PersonalInfo> results = jdbcTemplate.query(queryString,
+         * personalInfoRowMapper, id);
+         * return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+         */
         try {
             return Optional.ofNullable(jdbcTemplate.queryForObject(queryString, personalInfoRowMapper, id));
-        }catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }

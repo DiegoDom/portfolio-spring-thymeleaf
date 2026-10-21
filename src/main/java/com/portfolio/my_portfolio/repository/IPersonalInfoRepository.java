@@ -7,7 +7,10 @@ import java.util.Optional;
 
 public interface IPersonalInfoRepository {
     PersonalInfo save(PersonalInfo personalInfo);
+
     Optional<PersonalInfo> findById(Long id);
+
     List<PersonalInfo> findAll();
+
     void deleteById(Long id);
 }
