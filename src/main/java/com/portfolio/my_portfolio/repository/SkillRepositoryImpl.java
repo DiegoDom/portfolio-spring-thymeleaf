@@ -65,10 +65,9 @@ public class SkillRepositoryImpl implements ISkillRepository {
 
   @Override
   public Optional<Skill> findById(Long id) {
-    String sqlString = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+    String queryString = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
     try {
-      Skill skill = jdbcTemplate.queryForObject(sqlString, new Object[] { id }, skillRowMapper);
-      return Optional.ofNullable(skill);
+      return Optional.ofNullable(jdbcTemplate.queryForObject(queryString, skillRowMapper, id));
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
