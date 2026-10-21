@@ -2,11 +2,18 @@ package com.portfolio.my_portfolio.repository;
 
 import com.portfolio.my_portfolio.model.PersonalInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -58,7 +65,7 @@ public class PersonalInfoRepositoryImpl implements IPersonalInfoRepository {
                 return ps;
             }, keyHolder);
 
-            personalInfo.setId(ObjectUtils.requireNonNull(keyHolder.getKey()).longValue());
+            personalInfo.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
 
         } else {
             String sqlString = "UPDATE " + TABLE_NAME + " SET first_name = ?, last_name = ?, title = ?, profile_description = ?, " +
