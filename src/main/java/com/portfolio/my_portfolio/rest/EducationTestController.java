@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.portfolio.my_portfolio.model.Education;
-import com.portfolio.my_portfolio.model.Skill;
 import com.portfolio.my_portfolio.repository.EducationRepositoryImpl;
 
 @RestController
