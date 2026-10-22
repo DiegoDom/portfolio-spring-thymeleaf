@@ -1,6 +1,7 @@
 package com.portfolio.my_portfolio.repository;
 
 import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class SkillRepositoryImpl implements ISkillRepository {
     Skill skill = new Skill();
     skill.setId(rs.getLong("id"));
     skill.setName(rs.getString("name"));
-    skill.setLevelPercentage(rs.getInt("level_percentage"));
+    skill.setLevelPercentage(rs.getObject("level_percentage", Integer.class));
     skill.setIconClass(rs.getString("icon_class"));
     skill.setPersonalInfoId(rs.getLong("personal_info_id"));
 
@@ -43,7 +44,7 @@ public class SkillRepositoryImpl implements ISkillRepository {
       jdbcTemplate.update(connection -> {
         PreparedStatement ps = connection.prepareStatement(sqlString, new String[] { "id" });
         ps.setString(1, skill.getName());
-        ps.setInt(2, skill.getLevelPercentage());
+        ps.setObject(2, skill.getLevelPercentage(), Types.INTEGER);
         ps.setString(3, skill.getIconClass());
         ps.setLong(4, skill.getPersonalInfoId());
         return ps;
