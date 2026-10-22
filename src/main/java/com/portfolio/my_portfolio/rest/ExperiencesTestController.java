@@ -3,6 +3,8 @@ package com.portfolio.my_portfolio.rest;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +46,7 @@ public class ExperiencesTestController {
   }
 
   @PostMapping()
-  public ResponseEntity<Experience> create(@RequestBody Experience experience) {
+  public ResponseEntity<Experience> create(@Valid @RequestBody Experience experience) {
     Experience savedExperience = experienceService.save(experience);
     return new ResponseEntity<>(savedExperience, HttpStatus.CREATED);
   }
@@ -61,7 +63,7 @@ public class ExperiencesTestController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<Experience> update(@PathVariable Long id, @RequestBody Experience experience) {
+  public ResponseEntity<Experience> update(@PathVariable Long id, @Valid @RequestBody Experience experience) {
     Optional<Experience> existingExperience = experienceService.findById(id);
     if (existingExperience.isPresent()) {
       experience.setId(id);

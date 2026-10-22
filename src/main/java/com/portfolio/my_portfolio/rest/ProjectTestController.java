@@ -3,6 +3,8 @@ package com.portfolio.my_portfolio.rest;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +46,7 @@ public class ProjectTestController {
   }
 
   @PostMapping()
-  public ResponseEntity<Project> create(@RequestBody Project project) {
+  public ResponseEntity<Project> create(@Valid @RequestBody Project project) {
     Project savedProject = projectService.save(project);
     return new ResponseEntity<>(savedProject, HttpStatus.CREATED);
   }
@@ -61,7 +63,7 @@ public class ProjectTestController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<Project> update(@PathVariable Long id, @RequestBody Project project) {
+  public ResponseEntity<Project> update(@PathVariable Long id, @Valid @RequestBody Project project) {
     Optional<Project> existingProject = projectService.findById(id);
     if (existingProject.isPresent()) {
       project.setId(id);

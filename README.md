@@ -264,7 +264,7 @@ personal_info (id, first_name, last_name, title, profile_description,
 ./mvnw test
 ```
 
-La suite actual (`MyPortfolioApplicationTests`) verifica la carga del contexto de Spring. Requiere que PostgreSQL esté levantado, ya que la inicialización de `schema.sql`/`data.sql` ocurre al arrancar el contexto de pruebas.
+La suite actual incluye `MyPortfolioApplicationTests`, que verifica la carga del contexto de Spring (requiere que PostgreSQL esté levantado, ya que la inicialización de `schema.sql`/`data.sql` ocurre al arrancar el contexto de pruebas), y `ModelValidationTest`, que valida las anotaciones de Bean Validation de los modelos sin necesidad de base de datos.
 
 ---
 
@@ -275,7 +275,7 @@ La suite actual (`MyPortfolioApplicationTests`) verifica la carga del contexto d
 - **Los controladores son scaffolding temporal.** Están nombrados `*TestController` y expuestos bajo `/api/test/`. Si la API va a usarse en producción, renómbralos (p. ej. `SkillController`) y cambia el prefijo a `/api/`.
 - **Sin autenticación.** La API es pública y sin control de acceso. Añade Spring Security antes de exponerla.
 - **Sin CORS configurado.** Si el frontend React se sirve en otro origen, hay que añadir una configuración de CORS.
-- **Sin validación de entrada.** Los modelos no tienen Bean Validation (`@NotNull`, `@Size`, etc.); la validación de NOT NULL la hace PostgreSQL.
+- **Validación de entrada en los modelos.** Los modelos usan Bean Validation (`@NotBlank`, `@NotNull`, `@Size`, `@Email`, `@Min`, `@Max`, `@URL`) y los controladores anotan el cuerpo con `@Valid`, por lo que una petición inválida devuelve `400 Bad Request`. Las restricciones `NOT NULL` de PostgreSQL siguen actuando como última defensa.
 - **Sin DTOs ni manejo global de errores.** Los modelos se exponen directamente como contrato de la API y los errores se propagan como `ResponseStatusException`.
 
 ---

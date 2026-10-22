@@ -3,6 +3,8 @@ package com.portfolio.my_portfolio.rest;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +46,7 @@ public class SkillTestController {
   }
 
   @PostMapping()
-  public ResponseEntity<Skill> create(@RequestBody Skill skill) {
+  public ResponseEntity<Skill> create(@Valid @RequestBody Skill skill) {
     Skill savedSkill = skillService.save(skill);
     return new ResponseEntity<>(savedSkill, HttpStatus.CREATED);
   }
@@ -61,7 +63,7 @@ public class SkillTestController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<Skill> update(@PathVariable Long id, @RequestBody Skill skill) {
+  public ResponseEntity<Skill> update(@PathVariable Long id, @Valid @RequestBody Skill skill) {
     Optional<Skill> existingSkill = skillService.findById(id);
     if (existingSkill.isPresent()) {
       skill.setId(id);

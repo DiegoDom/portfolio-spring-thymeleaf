@@ -3,6 +3,8 @@ package com.portfolio.my_portfolio.rest;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +46,7 @@ public class EducationTestController {
   }
 
   @PostMapping()
-  public ResponseEntity<Education> create(@RequestBody Education education) {
+  public ResponseEntity<Education> create(@Valid @RequestBody Education education) {
     Education savedEducation = educationService.save(education);
     return new ResponseEntity<>(savedEducation, HttpStatus.CREATED);
   }
@@ -61,7 +63,7 @@ public class EducationTestController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<Education> update(@PathVariable Long id, @RequestBody Education education) {
+  public ResponseEntity<Education> update(@PathVariable Long id, @Valid @RequestBody Education education) {
     Optional<Education> existingEducation = educationService.findById(id);
     if (existingEducation.isPresent()) {
       education.setId(id);
