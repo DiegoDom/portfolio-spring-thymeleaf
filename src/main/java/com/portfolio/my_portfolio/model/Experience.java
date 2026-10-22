@@ -2,6 +2,7 @@ package com.portfolio.my_portfolio.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +25,10 @@ public class Experience {
     private String companyName;
 
     @NotNull(message = "The start date cannot be null")
+    @PastOrPresent(message = "The start date cannot be a future date")
     private LocalDate startDate;
 
+    @PastOrPresent(message = "The end date cannot be a future date")
     private LocalDate endDate;
 
     private String description;
