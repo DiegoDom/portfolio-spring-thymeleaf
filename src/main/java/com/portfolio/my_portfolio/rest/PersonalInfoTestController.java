@@ -47,7 +47,7 @@ public class PersonalInfoTestController {
   }
 
   @PostMapping()
-  public ResponseEntity<PersonalInfo> create(@Valid @RequestBody PersonalInfo personalInfo) {
+  public ResponseEntity<PersonalInfo> create(@RequestBody PersonalInfo personalInfo) {
     PersonalInfo savedPersonalInfo = personalInfoService.save(personalInfo);
     return new ResponseEntity<>(savedPersonalInfo, HttpStatus.CREATED);
   }
