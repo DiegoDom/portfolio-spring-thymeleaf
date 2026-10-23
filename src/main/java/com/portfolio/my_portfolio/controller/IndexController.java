@@ -1,9 +1,16 @@
 package com.portfolio.my_portfolio.controller;
 
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.portfolio.my_portfolio.dto.EducationMapper;
+import com.portfolio.my_portfolio.dto.ExperienceMapper;
+import com.portfolio.my_portfolio.dto.PersonalInfoMapper;
+import com.portfolio.my_portfolio.dto.ProjectMapper;
+import com.portfolio.my_portfolio.dto.SkillMapper;
 import com.portfolio.my_portfolio.model.PersonalInfo;
 import com.portfolio.my_portfolio.service.IEducationService;
 import com.portfolio.my_portfolio.service.IExperiencesService;
@@ -27,14 +34,24 @@ public class IndexController {
     PersonalInfo personalInfo = personalInfoService.find().orElse(null);
 
     if (personalInfo != null) {
-      model.addAttribute("personalInfo", personalInfo);
+      model.addAttribute("personalInfo", PersonalInfoMapper.toDto(personalInfo));
+    } else {
+      model.addAttribute("personalInfo", null);
     }
     model.addAttribute("initials", buildInitials(personalInfo));
 
-    model.addAttribute("educations", educationService.findAll());
-    model.addAttribute("skills", skillService.findAll());
-    model.addAttribute("experiences", experiencesService.findAll());
-    model.addAttribute("projects", projectService.findAll());
+    model.addAttribute("educations", educationService.findAll().stream()
+        .map(EducationMapper::toDto)
+        .collect(Collectors.toList()));
+    model.addAttribute("skills", skillService.findAll().stream()
+        .map(SkillMapper::toDto)
+        .collect(Collectors.toList()));
+    model.addAttribute("experiences", experiencesService.findAll().stream()
+        .map(ExperienceMapper::toDto)
+        .collect(Collectors.toList()));
+    model.addAttribute("projects", projectService.findAll().stream()
+        .map(ProjectMapper::tDto)
+        .collect(Collectors.toList()));
     return "index";
   }
 
@@ -50,3 +67,4 @@ public class IndexController {
     return value == null || value.isBlank() ? "" : value.substring(0, 1);
   }
 }
+

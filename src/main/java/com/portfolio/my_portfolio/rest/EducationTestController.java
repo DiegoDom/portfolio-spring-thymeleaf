@@ -2,6 +2,7 @@ package com.portfolio.my_portfolio.rest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.portfolio.my_portfolio.dto.EducationDto;
+import com.portfolio.my_portfolio.dto.EducationMapper;
 import com.portfolio.my_portfolio.model.Education;
 import com.portfolio.my_portfolio.service.EducationServiceImpl;
 
@@ -30,25 +33,28 @@ public class EducationTestController {
   }
 
   @GetMapping("/all")
-  public List<Education> findAll() {
-    return educationService.findAll();
+  public List<EducationDto> findAll() {
+    return educationService.findAll().stream()
+        .map(EducationMapper::toDto)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("{id}")
-  public Education findById(@PathVariable Long id) {
+  public EducationDto findById(@PathVariable Long id) {
     Optional<Education> education = educationService.findById(id);
 
     if (education.isPresent()) {
-      return education.get();
+      return EducationMapper.toDto(education.get());
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Education not found with id: " + id);
     }
   }
 
   @PostMapping()
-  public ResponseEntity<Education> create(@Valid @RequestBody Education education) {
+  public ResponseEntity<EducationDto> create(@Valid @RequestBody EducationDto educationDto) {
+    Education education = EducationMapper.toEducation(educationDto);
     Education savedEducation = educationService.save(education);
-    return new ResponseEntity<>(savedEducation, HttpStatus.CREATED);
+    return new ResponseEntity<>(EducationMapper.toDto(savedEducation), HttpStatus.CREATED);
   }
 
   @DeleteMapping("{id}")
@@ -63,14 +69,16 @@ public class EducationTestController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<Education> update(@PathVariable Long id, @Valid @RequestBody Education education) {
+  public ResponseEntity<EducationDto> update(@PathVariable Long id, @Valid @RequestBody EducationDto educationDto) {
     Optional<Education> existingEducation = educationService.findById(id);
     if (existingEducation.isPresent()) {
-      education.setId(id);
+      educationDto.setId(id);
+      Education education = EducationMapper.toEducation(educationDto);
       Education updatedEducation = educationService.save(education);
-      return new ResponseEntity<>(updatedEducation, HttpStatus.OK);
+      return new ResponseEntity<>(EducationMapper.toDto(updatedEducation), HttpStatus.OK);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Education not found with id: " + id);
     }
   }
 }
+

@@ -1,13 +1,17 @@
 package com.portfolio.my_portfolio.controller;
 
+import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.portfolio.my_portfolio.model.PersonalInfo;
+import com.portfolio.my_portfolio.dto.PersonalInfoDto;
+import com.portfolio.my_portfolio.dto.PersonalInfoMapper;
 import com.portfolio.my_portfolio.service.IPersonalInfoService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,14 +24,20 @@ public class PortfolioController {
 
   @GetMapping("/form")
   public String showForm(Model model) {
-    PersonalInfo personalInfo = personalInfoService.find().orElseGet(PersonalInfo::new);
+    PersonalInfoDto personalInfo = personalInfoService.find()
+        .map(PersonalInfoMapper::toDto)
+        .orElseGet(PersonalInfoDto::new);
     model.addAttribute("personalInfo", personalInfo);
     return "form";
   }
 
   @PostMapping("/save")
-  public String save(@ModelAttribute("personalInfo") PersonalInfo personalInfo) {
-    personalInfoService.save(personalInfo);
+  public String save(@Valid @ModelAttribute("personalInfo") PersonalInfoDto personalInfoDto, BindingResult bindingResult) {
+    if (bindingResult.hasErrors()) {
+      return "form";
+    }
+    personalInfoService.save(PersonalInfoMapper.toPersonalInfo(personalInfoDto));
     return "redirect:/";
   }
 }
+

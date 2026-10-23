@@ -2,6 +2,9 @@ package com.portfolio.my_portfolio.rest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.portfolio.my_portfolio.dto.ProjectDto;
+import com.portfolio.my_portfolio.dto.ProjectMapper;
 import com.portfolio.my_portfolio.model.Project;
 import com.portfolio.my_portfolio.service.ProjectServiceImpl;
 
@@ -28,25 +33,28 @@ public class ProjectTestController {
   }
 
   @GetMapping("/all")
-  public List<Project> findAll() {
-    return projectService.findAll();
+  public List<ProjectDto> findAll() {
+    return projectService.findAll().stream()
+        .map(ProjectMapper::tDto)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("{id}")
-  public Project findById(@PathVariable Long id) {
+  public ProjectDto findById(@PathVariable Long id) {
     Optional<Project> project = projectService.findById(id);
 
     if (project.isPresent()) {
-      return project.get();
+      return ProjectMapper.tDto(project.get());
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + id);
     }
   }
 
   @PostMapping()
-  public ResponseEntity<Project> create(@RequestBody Project project) {
+  public ResponseEntity<ProjectDto> create(@Valid @RequestBody ProjectDto projectDto) {
+    Project project = ProjectMapper.toProject(projectDto);
     Project savedProject = projectService.save(project);
-    return new ResponseEntity<>(savedProject, HttpStatus.CREATED);
+    return new ResponseEntity<>(ProjectMapper.tDto(savedProject), HttpStatus.CREATED);
   }
 
   @DeleteMapping("{id}")
@@ -61,15 +69,17 @@ public class ProjectTestController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<Project> update(@PathVariable Long id, @RequestBody Project project) {
+  public ResponseEntity<ProjectDto> update(@PathVariable Long id, @Valid @RequestBody ProjectDto projectDto) {
     Optional<Project> existingProject = projectService.findById(id);
     if (existingProject.isPresent()) {
-      project.setId(id);
+      projectDto.setId(id);
+      Project project = ProjectMapper.toProject(projectDto);
       Project updatedProject = projectService.save(project);
-      return new ResponseEntity<>(updatedProject, HttpStatus.OK);
+      return new ResponseEntity<>(ProjectMapper.tDto(updatedProject), HttpStatus.OK);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + id);
     }
   }
 
 }
+

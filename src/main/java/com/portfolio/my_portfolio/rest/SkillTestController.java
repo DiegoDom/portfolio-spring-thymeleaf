@@ -2,6 +2,7 @@ package com.portfolio.my_portfolio.rest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.portfolio.my_portfolio.dto.SkillDto;
+import com.portfolio.my_portfolio.dto.SkillMapper;
 import com.portfolio.my_portfolio.model.Skill;
 import com.portfolio.my_portfolio.service.SkillServiceImpl;
 
@@ -30,25 +33,28 @@ public class SkillTestController {
   }
 
   @GetMapping("/all")
-  public List<Skill> findAll() {
-    return skillService.findAll();
+  public List<SkillDto> findAll() {
+    return skillService.findAll().stream()
+        .map(SkillMapper::toDto)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("{id}")
-  public Skill findById(@PathVariable Long id) {
+  public SkillDto findById(@PathVariable Long id) {
     Optional<Skill> skill = skillService.findById(id);
 
     if (skill.isPresent()) {
-      return skill.get();
+      return SkillMapper.toDto(skill.get());
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found with id: " + id);
     }
   }
 
   @PostMapping()
-  public ResponseEntity<Skill> create(@Valid @RequestBody Skill skill) {
+  public ResponseEntity<SkillDto> create(@Valid @RequestBody SkillDto skillDto) {
+    Skill skill = SkillMapper.toSkill(skillDto);
     Skill savedSkill = skillService.save(skill);
-    return new ResponseEntity<>(savedSkill, HttpStatus.CREATED);
+    return new ResponseEntity<>(SkillMapper.toDto(savedSkill), HttpStatus.CREATED);
   }
 
   @DeleteMapping("{id}")
@@ -63,14 +69,16 @@ public class SkillTestController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<Skill> update(@PathVariable Long id, @Valid @RequestBody Skill skill) {
+  public ResponseEntity<SkillDto> update(@PathVariable Long id, @Valid @RequestBody SkillDto skillDto) {
     Optional<Skill> existingSkill = skillService.findById(id);
     if (existingSkill.isPresent()) {
-      skill.setId(id);
+      skillDto.setId(id);
+      Skill skill = SkillMapper.toSkill(skillDto);
       Skill updatedSkill = skillService.save(skill);
-      return new ResponseEntity<>(updatedSkill, HttpStatus.OK);
+      return new ResponseEntity<>(SkillMapper.toDto(updatedSkill), HttpStatus.OK);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Skill not found with id: " + id);
     }
   }
 }
+

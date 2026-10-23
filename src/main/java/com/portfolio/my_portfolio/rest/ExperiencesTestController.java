@@ -2,6 +2,7 @@ package com.portfolio.my_portfolio.rest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.portfolio.my_portfolio.dto.ExperienceDto;
+import com.portfolio.my_portfolio.dto.ExperienceMapper;
 import com.portfolio.my_portfolio.model.Experience;
 import com.portfolio.my_portfolio.service.ExperienceServiceImpl;
 
@@ -30,25 +33,28 @@ public class ExperiencesTestController {
   }
 
   @GetMapping("/all")
-  public List<Experience> findAll() {
-    return experienceService.findAll();
+  public List<ExperienceDto> findAll() {
+    return experienceService.findAll().stream()
+        .map(ExperienceMapper::toDto)
+        .collect(Collectors.toList());
   }
 
   @GetMapping("{id}")
-  public Experience findById(@PathVariable Long id) {
+  public ExperienceDto findById(@PathVariable Long id) {
     Optional<Experience> experience = experienceService.findById(id);
 
     if (experience.isPresent()) {
-      return experience.get();
+      return ExperienceMapper.toDto(experience.get());
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience not found with id: " + id);
     }
   }
 
   @PostMapping()
-  public ResponseEntity<Experience> create(@Valid @RequestBody Experience experience) {
+  public ResponseEntity<ExperienceDto> create(@Valid @RequestBody ExperienceDto experienceDto) {
+    Experience experience = ExperienceMapper.toExperience(experienceDto);
     Experience savedExperience = experienceService.save(experience);
-    return new ResponseEntity<>(savedExperience, HttpStatus.CREATED);
+    return new ResponseEntity<>(ExperienceMapper.toDto(savedExperience), HttpStatus.CREATED);
   }
 
   @DeleteMapping("{id}")
@@ -63,14 +69,16 @@ public class ExperiencesTestController {
   }
 
   @PutMapping("{id}")
-  public ResponseEntity<Experience> update(@PathVariable Long id, @Valid @RequestBody Experience experience) {
+  public ResponseEntity<ExperienceDto> update(@PathVariable Long id, @Valid @RequestBody ExperienceDto experienceDto) {
     Optional<Experience> existingExperience = experienceService.findById(id);
     if (existingExperience.isPresent()) {
-      experience.setId(id);
+      experienceDto.setId(id);
+      Experience experience = ExperienceMapper.toExperience(experienceDto);
       Experience updatedExperience = experienceService.save(experience);
-      return new ResponseEntity<>(updatedExperience, HttpStatus.OK);
+      return new ResponseEntity<>(ExperienceMapper.toDto(updatedExperience), HttpStatus.OK);
     } else {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience not found with id: " + id);
     }
   }
 }
+
