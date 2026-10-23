@@ -8,14 +8,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 
 import com.portfolio.my_portfolio.exception.ValidationException;
 import com.portfolio.my_portfolio.model.Project;
 import com.portfolio.my_portfolio.repository.ProjectRepositoryImpl;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements IProjectService {
 
@@ -25,6 +28,11 @@ public class ProjectServiceImpl implements IProjectService {
   @Override
   @Transactional
   public Project save(Project project) {
+    if (project.getTitle() == null || project.getTitle().isBlank()) {
+      BeanPropertyBindingResult result = new BeanPropertyBindingResult(project, "project");
+      result.rejectValue("title", "", "The title cannot be empty");
+      throw new ValidationException(result);
+    }
     BindingResult result = new BeanPropertyBindingResult(project, "project");
     validator.validate(project, result);
 

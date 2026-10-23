@@ -21,6 +21,7 @@ import com.portfolio.my_portfolio.dto.ProjectDto;
 import com.portfolio.my_portfolio.dto.ProjectMapper;
 import com.portfolio.my_portfolio.model.Project;
 import com.portfolio.my_portfolio.service.FileStorageService;
+import com.portfolio.my_portfolio.service.IPersonalInfoService;
 import com.portfolio.my_portfolio.service.ProjectService;
 
 import jakarta.validation.Valid;
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class ProjectController {
   private final ProjectService projectService;
   private final FileStorageService fileStorageService;
+  private final IPersonalInfoService personalInfoService;
 
   @GetMapping({"/", ""})
   public String getAll(Model model) {
@@ -66,6 +68,7 @@ public class ProjectController {
       }
 
       Project project = ProjectMapper.toProject(projectDto);
+      project.setPersonalInfoId(currentPersonalInfoId());
       projectService.save(project);
 
       return "redirect:/projects/";
@@ -122,6 +125,7 @@ public class ProjectController {
 
       projectDto.setId(id);
       Project project = ProjectMapper.toProject(projectDto);
+      project.setPersonalInfoId(currentPersonalInfoId());
       projectService.save(project);
 
       return "redirect:/projects/";
@@ -146,5 +150,12 @@ public class ProjectController {
 
     projectService.deleteById(id);
     return "redirect:/projects/";
+  }
+
+  private Long currentPersonalInfoId() {
+    return personalInfoService.find()
+        .map(personalInfo -> personalInfo.getId())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
+            "Personal info is not configured"));
   }
 }

@@ -153,6 +153,6 @@ class ModelValidationTest {
   }
 
   private static Project validProject() {
-    return new Project(null, "Portfolio Personal", null, "img/portfolio-project.jpg", null, 1L);
+    return new Project(null, "Portfolio Personal", "Descripción del proyecto", "img/portfolio-project.jpg", null, 1L);
   }
 }

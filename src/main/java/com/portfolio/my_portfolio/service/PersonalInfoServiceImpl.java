@@ -1,6 +1,5 @@
 package com.portfolio.my_portfolio.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class PersonalInfoServiceImpl implements IPersonalInfoService {
   public PersonalInfo save(PersonalInfo personalInfo) {
     BindingResult result = new BeanPropertyBindingResult(personalInfo, "personalInfo");
     validator.validate(personalInfo, result);
-    System.out.println(result.getAllErrors());
+
     if (result.hasErrors()) {
       throw new ValidationException(result);
     }
@@ -37,20 +36,8 @@ public class PersonalInfoServiceImpl implements IPersonalInfoService {
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<PersonalInfo> findById(Long id) {
-    return personalInfoRepository.findById(id);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<PersonalInfo> findAll() {
-    return personalInfoRepository.findAll();
-  }
-
-  @Override
-  @Transactional
-  public void deleteById(Long id) {
-    personalInfoRepository.deleteById(id);
+  public Optional<PersonalInfo> find() {
+    return personalInfoRepository.find();
   }
 
 }

@@ -27,7 +27,7 @@ class SkillServiceTest extends ServiceIntegrationTestSupport {
 
   @BeforeEach
   void setUp() {
-    personalInfoId = givenPersonalInfo().getId();
+    personalInfoId = seededPersonalInfo().getId();
   }
 
   @Test

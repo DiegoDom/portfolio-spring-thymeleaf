@@ -2,9 +2,7 @@ package com.portfolio.my_portfolio.dto;
 
 import org.hibernate.validator.constraints.URL;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,8 +24,4 @@ public class ProjectDto {
 
   @URL(message = "The project URL cannot exceed 500 characters")
   private String projectUrl;
-
-  @NotNull(message = "The personal info id cannot be null")
-  @Min(value = 1, message = "The personal info ID cannot be less than zero")
-  private Long personalInfoId;
 }

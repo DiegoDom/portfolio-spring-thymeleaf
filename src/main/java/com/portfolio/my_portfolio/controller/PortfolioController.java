@@ -20,7 +20,8 @@ public class PortfolioController {
 
   @GetMapping("/form")
   public String showForm(Model model) {
-    model.addAttribute("personalInfo", new PersonalInfo());
+    PersonalInfo personalInfo = personalInfoService.find().orElseGet(PersonalInfo::new);
+    model.addAttribute("personalInfo", personalInfo);
     return "form";
   }
 

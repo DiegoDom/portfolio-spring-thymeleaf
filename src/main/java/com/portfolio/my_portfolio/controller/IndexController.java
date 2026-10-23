@@ -1,7 +1,5 @@
 package com.portfolio.my_portfolio.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +24,7 @@ public class IndexController {
 
   @GetMapping("/")
   public String showIndex(Model model) {
-    List<PersonalInfo> personalInfos = personalInfoService.findAll();
-    PersonalInfo personalInfo = personalInfos.isEmpty() ? null : personalInfos.get(0);
+    PersonalInfo personalInfo = personalInfoService.find().orElse(null);
 
     if (personalInfo != null) {
       model.addAttribute("personalInfo", personalInfo);

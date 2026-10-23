@@ -29,7 +29,7 @@ class ExperienceServiceTest extends ServiceIntegrationTestSupport {
 
   @BeforeEach
   void setUp() {
-    personalInfoId = givenPersonalInfo().getId();
+    personalInfoId = seededPersonalInfo().getId();
   }
 
   @Test

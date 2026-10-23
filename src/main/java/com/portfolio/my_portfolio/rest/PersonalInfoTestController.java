@@ -1,16 +1,11 @@
 package com.portfolio.my_portfolio.rest;
 
-import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,49 +25,20 @@ public class PersonalInfoTestController {
     this.personalInfoService = personalInfoService;
   }
 
-  @GetMapping("/all")
-  public List<PersonalInfo> findAll() {
-    return personalInfoService.findAll();
-  }
-
-  @GetMapping("{id}")
-  public PersonalInfo findById(@PathVariable Long id) {
-    Optional<PersonalInfo> personalInfo = personalInfoService.findById(id);
+  @GetMapping
+  public PersonalInfo find() {
+    Optional<PersonalInfo> personalInfo = personalInfoService.find();
 
     if (personalInfo.isPresent()) {
       return personalInfo.get();
     } else {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PersonalInfo not found with id: " + id);
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PersonalInfo not found");
     }
   }
 
-  @PostMapping()
-  public ResponseEntity<PersonalInfo> create(@RequestBody PersonalInfo personalInfo) {
-    PersonalInfo savedPersonalInfo = personalInfoService.save(personalInfo);
-    return new ResponseEntity<>(savedPersonalInfo, HttpStatus.CREATED);
-  }
-
-  @DeleteMapping("{id}")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
-    Optional<PersonalInfo> personalInfo = personalInfoService.findById(id);
-    if (personalInfo.isPresent()) {
-      personalInfoService.deleteById(id);
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } else {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PersonalInfo not found with id: " + id);
-    }
-  }
-
-  @PutMapping("{id}")
-  public ResponseEntity<PersonalInfo> update(@PathVariable Long id, @Valid @RequestBody PersonalInfo personalInfo) {
-    Optional<PersonalInfo> existingPersonalInfo = personalInfoService.findById(id);
-    if (existingPersonalInfo.isPresent()) {
-      personalInfo.setId(id);
-      PersonalInfo updatedPersonalInfo = personalInfoService.save(personalInfo);
-      return new ResponseEntity<>(updatedPersonalInfo, HttpStatus.OK);
-    } else {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "PersonalInfo not found with id: " + id);
-    }
+  @PutMapping
+  public PersonalInfo save(@Valid @RequestBody PersonalInfo personalInfo) {
+    return personalInfoService.save(personalInfo);
   }
 
 }

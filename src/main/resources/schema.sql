@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS personal_info;
 
 
 CREATE TABLE personal_info (
-    id SERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY DEFAULT 1,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
     title VARCHAR(255) NOT NULL,
@@ -16,7 +16,8 @@ CREATE TABLE personal_info (
     email VARCHAR(255),
     phone VARCHAR(50),
     linkedin_url VARCHAR(500),
-    github_url VARCHAR(500)
+    github_url VARCHAR(500),
+    CONSTRAINT personal_info_singleton CHECK (id = 1)
 );
 
 CREATE TABLE skills (

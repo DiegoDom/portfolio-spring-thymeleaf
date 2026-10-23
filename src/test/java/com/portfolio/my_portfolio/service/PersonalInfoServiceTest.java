@@ -3,71 +3,85 @@ package com.portfolio.my_portfolio.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.time.LocalDate;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.portfolio.my_portfolio.exception.ValidationException;
-import com.portfolio.my_portfolio.model.Education;
-import com.portfolio.my_portfolio.model.Experience;
 import com.portfolio.my_portfolio.model.PersonalInfo;
-import com.portfolio.my_portfolio.model.Project;
-import com.portfolio.my_portfolio.model.Skill;
-import com.portfolio.my_portfolio.repository.IEducationRepository;
-import com.portfolio.my_portfolio.repository.IExperienceRespository;
 import com.portfolio.my_portfolio.repository.IPersonalInfoRepository;
-import com.portfolio.my_portfolio.repository.IProjectRepository;
-import com.portfolio.my_portfolio.repository.ISkillRepository;
 
 class PersonalInfoServiceTest extends ServiceIntegrationTestSupport {
 
-  private static final int SEEDED_PERSONAL_INFO = 1;
+  private static final Long SINGLETON_ID = 1L;
 
   @Autowired
   private IPersonalInfoRepository personalInfoRepository;
 
   @Autowired
-  private ISkillService skillService;
-
-  @Autowired
-  private IEducationService educationService;
-
-  @Autowired
-  private IExperiencesService experienceService;
-
-  @Autowired
-  private IProjectService projectService;
-
-  @Autowired
-  private ISkillRepository skillRepository;
-
-  @Autowired
-  private IEducationRepository educationRepository;
-
-  @Autowired
-  private IExperienceRespository experienceRepository;
-
-  @Autowired
-  private IProjectRepository projectRepository;
+  private JdbcTemplate jdbcTemplate;
 
   @Test
-  void save_insertsNewPersonalInfoAndReadsBackAllColumns() {
+  void find_returnsSeededPersonalInfo() {
+    PersonalInfo personalInfo = personalInfoService.find().orElseThrow();
+
+    assertThat(personalInfo.getId()).isEqualTo(SINGLETON_ID);
+    assertThat(personalInfo.getFirstName()).isEqualTo("Diego Alberto");
+    assertThat(personalInfo.getLastName()).isEqualTo("Dominguez");
+    assertThat(personalInfo.getTitle()).isEqualTo("Full Stack Developer");
+    assertThat(personalInfo.getProfileDescription()).isEqualTo(
+        "Apasionado por el desarrollo web con experiencia en Java, Spring Boot y React. "
+            + "Disfruto construyendo soluciones robustas y escalables.");
+    assertThat(personalInfo.getProfileImageUrl()).isEqualTo("img/profile-placeholder.jpg");
+    assertThat(personalInfo.getYearsOfExperience()).isEqualTo(5);
+    assertThat(personalInfo.getEmail()).isEqualTo("juan.perez@example.com");
+    assertThat(personalInfo.getPhone()).isEqualTo("+523348385911");
+    assertThat(personalInfo.getLinkedinUrl()).isEqualTo("https://www.linkedin.com/in/diegodom/");
+    assertThat(personalInfo.getGithubUrl()).isEqualTo("https://github.com/DiegoDom");
+  }
+
+  @Test
+  void save_updatesSingletonWithoutInsertingAnotherRow() {
+    PersonalInfo current = personalInfoService.find().orElseThrow();
+    current.setLastName("Dominguez Actualizado");
+    current.setTitle("Senior Full Stack Developer");
+    current.setYearsOfExperience(6);
+    current.setGithubUrl("https://github.com/DiegoDom");
+
+    PersonalInfo saved = personalInfoService.save(current);
+
+    assertThat(saved.getId()).isEqualTo(SINGLETON_ID);
+
+    PersonalInfo reloaded = personalInfoRepository.find().orElseThrow();
+    assertThat(reloaded.getLastName()).isEqualTo("Dominguez Actualizado");
+    assertThat(reloaded.getTitle()).isEqualTo("Senior Full Stack Developer");
+    assertThat(reloaded.getYearsOfExperience()).isEqualTo(6);
+    assertThat(countPersonalInfoRows()).isEqualTo(1L);
+  }
+
+  @Test
+  void save_withClientProvidedId_stillUsesSingletonId() {
+    PersonalInfo personalInfo = fullPersonalInfo();
+    personalInfo.setId(9_999_999L);
+
+    PersonalInfo saved = personalInfoService.save(personalInfo);
+
+    assertThat(saved.getId()).isEqualTo(SINGLETON_ID);
+    assertThat(personalInfoRepository.find().orElseThrow().getFirstName()).isEqualTo("Diego");
+    assertThat(countPersonalInfoRows()).isEqualTo(1L);
+  }
+
+  @Test
+  void save_whenNoRowExists_insertsSingleton() {
+    jdbcTemplate.update("DELETE FROM personal_info WHERE id = ?", SINGLETON_ID);
+
+    assertThat(personalInfoService.find()).isEmpty();
+
     PersonalInfo saved = personalInfoService.save(fullPersonalInfo());
 
-    assertThat(saved.getId()).isNotNull();
-
-    PersonalInfo reloaded = personalInfoRepository.findById(saved.getId()).orElseThrow();
-    assertThat(reloaded.getFirstName()).isEqualTo("Diego");
-    assertThat(reloaded.getLastName()).isEqualTo("Dominguez");
-    assertThat(reloaded.getTitle()).isEqualTo("Full Stack Developer");
-    assertThat(reloaded.getProfileDescription()).isEqualTo("Apasionado por el desarrollo web.");
-    assertThat(reloaded.getProfileImageUrl()).isEqualTo("img/profile.png");
-    assertThat(reloaded.getYearsOfExperience()).isEqualTo(8);
-    assertThat(reloaded.getEmail()).isEqualTo("diego@example.com");
-    assertThat(reloaded.getPhone()).isEqualTo("+523348385911");
-    assertThat(reloaded.getLinkedinUrl()).isEqualTo("https://www.linkedin.com/in/diegodom/");
-    assertThat(reloaded.getGithubUrl()).isEqualTo("https://github.com/DiegoDom");
+    assertThat(saved.getId()).isEqualTo(SINGLETON_ID);
+    assertThat(personalInfoRepository.find().orElseThrow().getFirstName()).isEqualTo("Diego");
+    assertThat(countPersonalInfoRows()).isEqualTo(1L);
   }
 
   @Test
@@ -76,7 +90,9 @@ class PersonalInfoServiceTest extends ServiceIntegrationTestSupport {
         null, "Diego", "Dominguez", "Full Stack Developer", "Descripción",
         null, null, "diego@example.com", "+523348385911", null, null));
 
-    PersonalInfo reloaded = personalInfoRepository.findById(saved.getId()).orElseThrow();
+    PersonalInfo reloaded = personalInfoRepository.find().orElseThrow();
+    assertThat(reloaded.getId()).isEqualTo(SINGLETON_ID);
+    assertThat(reloaded.getId()).isEqualTo(saved.getId());
     assertThat(reloaded.getProfileImageUrl()).isNull();
     assertThat(reloaded.getYearsOfExperience()).isNull();
     assertThat(reloaded.getLinkedinUrl()).isNull();
@@ -84,53 +100,9 @@ class PersonalInfoServiceTest extends ServiceIntegrationTestSupport {
   }
 
   @Test
-  void save_withExistingId_updatesWithoutInserting() {
-    PersonalInfo created = givenPersonalInfo();
-
-    created.setLastName("Dominguez Actualizado");
-    created.setTitle("Senior Full Stack Developer");
-    created.setYearsOfExperience(6);
-    created.setGithubUrl("https://github.com/DiegoDom");
-    personalInfoService.save(created);
-
-    PersonalInfo reloaded = personalInfoRepository.findById(created.getId()).orElseThrow();
-    assertThat(reloaded.getLastName()).isEqualTo("Dominguez Actualizado");
-    assertThat(reloaded.getTitle()).isEqualTo("Senior Full Stack Developer");
-    assertThat(reloaded.getYearsOfExperience()).isEqualTo(6);
-    assertThat(reloaded.getGithubUrl()).isEqualTo("https://github.com/DiegoDom");
-    assertThat(personalInfoService.findAll()).hasSize(SEEDED_PERSONAL_INFO + 1);
-  }
-
-  @Test
-  void findById_returnsEmptyWhenNotExists() {
-    assertThat(personalInfoService.findById(9_999_999L)).isEmpty();
-  }
-
-  @Test
-  void findAll_returnsSeededRowPlusTheNewOne() {
-    givenPersonalInfo();
-
-    assertThat(personalInfoService.findAll()).hasSize(SEEDED_PERSONAL_INFO + 1);
-  }
-
-  @Test
-  void deleteById_removesTheRow() {
-    PersonalInfo saved = givenPersonalInfo();
-
-    personalInfoService.deleteById(saved.getId());
-
-    assertThat(personalInfoRepository.findById(saved.getId())).isEmpty();
-  }
-
-  @Test
-  void deleteById_missingIdDoesNotThrow() {
-    personalInfoService.deleteById(9_999_999L);
-
-    assertThat(personalInfoService.findAll()).hasSize(SEEDED_PERSONAL_INFO);
-  }
-
-  @Test
   void save_invalidEmailThrowsAndPersistsNothing() {
+    PersonalInfo original = personalInfoService.find().orElseThrow();
+
     PersonalInfo invalid = fullPersonalInfo();
     invalid.setEmail("not-an-email");
 
@@ -138,27 +110,15 @@ class PersonalInfoServiceTest extends ServiceIntegrationTestSupport {
         () -> personalInfoService.save(invalid));
 
     assertThat(ex.getBindingResult().getFieldError("email")).isNotNull();
-    assertThat(personalInfoRepository.findAll()).hasSize(SEEDED_PERSONAL_INFO);
+
+    PersonalInfo reloaded = personalInfoRepository.find().orElseThrow();
+    assertThat(reloaded.getFirstName()).isEqualTo(original.getFirstName());
+    assertThat(reloaded.getEmail()).isEqualTo(original.getEmail());
   }
 
-  @Test
-  void deleteById_withChildren_cascadesToAllChildTables() {
-    PersonalInfo parent = givenPersonalInfo();
-
-    Skill skill = skillService.save(new Skill(null, "Kotlin", 50, null, parent.getId()));
-    Education education = educationService.save(new Education(null, "Ingeniería", "Universidad XYZ",
-        LocalDate.of(2015, 3, 1), null, null, parent.getId()));
-    Experience experience = experienceService.save(new Experience(null, "Desarrollador", "Tech Solutions",
-        LocalDate.of(2022, 1, 1), null, null, parent.getId()));
-    Project project = projectService.save(new Project(null, "Portfolio", null, null, null, parent.getId()));
-
-    personalInfoService.deleteById(parent.getId());
-
-    assertThat(personalInfoRepository.findById(parent.getId())).isEmpty();
-    assertThat(skillRepository.findById(skill.getId())).isEmpty();
-    assertThat(educationRepository.findById(education.getId())).isEmpty();
-    assertThat(experienceRepository.findById(experience.getId())).isEmpty();
-    assertThat(projectRepository.findById(project.getId())).isEmpty();
+  private long countPersonalInfoRows() {
+    Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM personal_info", Long.class);
+    return count == null ? 0L : count;
   }
 
   private PersonalInfo fullPersonalInfo() {

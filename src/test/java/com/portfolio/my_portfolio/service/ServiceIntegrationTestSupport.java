@@ -14,21 +14,11 @@ abstract class ServiceIntegrationTestSupport extends PostgresIntegrationTestSupp
   protected IPersonalInfoService personalInfoService;
 
   /**
-   * Crea un personal_info fresco por test en lugar de depender del id 1 del
-   * seed. El rollback de @Transactional lo elimina al terminar el método.
+   * Devuelve el perfil único sembrado por data.sql. personal_info es un
+   * singleton, así que los tests solo necesitan su id para la FK.
    */
-  protected PersonalInfo givenPersonalInfo() {
-    return personalInfoService.save(new PersonalInfo(
-        null,
-        "Test",
-        "User",
-        "Developer",
-        "Descripción de prueba",
-        null,
-        1,
-        "test.user@example.com",
-        "+525551234567",
-        null,
-        null));
+  protected PersonalInfo seededPersonalInfo() {
+    return personalInfoService.find()
+        .orElseThrow(() -> new IllegalStateException("Seeded personal_info row is missing"));
   }
 }

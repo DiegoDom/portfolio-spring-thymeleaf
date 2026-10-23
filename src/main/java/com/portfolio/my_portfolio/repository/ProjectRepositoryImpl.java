@@ -37,6 +37,12 @@ public class ProjectRepositoryImpl implements IProjectRepository {
   @Override
   public Project save(Project project) {
     if (project.getId() == null) {
+      if (project.getTitle() == null || project.getTitle().trim().isEmpty()) {
+        throw new com.portfolio.my_portfolio.exception.ValidationException(
+            new org.springframework.validation.BeanPropertyBindingResult(project, "project") {{
+              rejectValue("title", "", "The title cannot be empty");
+            }});
+      }
       String sqlString = "INSERT INTO " + TABLE_NAME
           + " (title, description, image_url, project_url, personal_info_id) VALUES (?, ?, ?, ?, ?)";
       KeyHolder keyHolder = new GeneratedKeyHolder();
