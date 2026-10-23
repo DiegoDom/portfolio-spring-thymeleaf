@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <section id="contact" class="section section--contact" th:fragment="contact">
+    <div class="container">
+      <div class="contact-panel reveal">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <p class="eyebrow"><span class="eyebrow-index">05</span> Contacto</p>
+            <h2 class="section-title mb-3">¿Construimos algo juntos?</h2>
+            <p class="section-lead mb-0">
+              Estoy abierto a nuevos retos: productos, equipos y problemas que merezcan la pena resolver.
+              Escríbeme y hablamos.
+            </p>
+          </div>
+
+          <div class="col-lg-5" th:if="${personalInfo != null}">
+            <div class="contact-actions">
+              <a class="contact-link" th:if="${not #strings.isEmpty(personalInfo.email)}"
+                th:href="|mailto:${personalInfo.email}|">
+                <span class="contact-link__icon" aria-hidden="true"><i class="bi bi-envelope-paper"></i></span>
+                <span class="contact-link__text">
+                  <small>Email</small>
+                  <strong th:text="${personalInfo.email}">correo@ejemplo.com</strong>
+                </span>
+              </a>
+
+              <a class="contact-link" th:if="${not #strings.isEmpty(personalInfo.phone)}"
+                th:href="|tel:${#strings.replace(personalInfo.phone, ' ', '')}|">
+                <span class="contact-link__icon" aria-hidden="true"><i class="bi bi-telephone"></i></span>
+                <span class="contact-link__text">
+                  <small>Teléfono</small>
+                  <strong th:text="${personalInfo.phone}">+52 000 000 0000</strong>
+                </span>
+              </a>
+
+              <div class="d-flex gap-2 pt-1"
+                th:if="${not #strings.isEmpty(personalInfo.githubUrl) or not #strings.isEmpty(personalInfo.linkedinUrl)}">
+                <a class="btn btn-ghost btn-sm flex-grow-1" th:if="${not #strings.isEmpty(personalInfo.githubUrl)}"
+                  th:href="${personalInfo.githubUrl}" target="_blank" rel="noopener noreferrer">
+                  <i class="bi bi-github me-2" aria-hidden="true"></i>GitHub
+                </a>
+                <a class="btn btn-ghost btn-sm flex-grow-1" th:if="${not #strings.isEmpty(personalInfo.linkedinUrl)}"
+                  th:href="${personalInfo.linkedinUrl}" target="_blank" rel="noopener noreferrer">
+                  <i class="bi bi-linkedin me-2" aria-hidden="true"></i>LinkedIn
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5" th:if="${personalInfo == null}">
+            <p class="section-lead mb-0">
+              Aún no hay datos de contacto cargados.
+              <a th:href="@{/personal-info/form}" class="link-accent">Añádelos aquí</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <footer class="site-footer" th:fragment="footer">
+    <div class="container">
+      <div class="site-footer__inner">
+        <div class="site-footer__brand">
+          <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+          <div>
+            <p class="site-footer__name"
+              th:text="${personalInfo != null ? personalInfo.firstName + ' ' + personalInfo.lastName : 'Portfolio'}">
+              Diego Dominguez</p>
+            <p class="site-footer__note">Portfolio construido con Spring Boot, Thymeleaf y Bootstrap.</p>
+          </div>
+        </div>
+
+        <nav class="site-footer__links" aria-label="Redes sociales">
+          <a class="icon-btn icon-btn--sm" th:if="${personalInfo != null and not #strings.isEmpty(personalInfo.githubUrl)}"
+            th:href="${personalInfo.githubUrl}" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <i class="bi bi-github" aria-hidden="true"></i>
+          </a>
+          <a class="icon-btn icon-btn--sm" th:if="${personalInfo != null and not #strings.isEmpty(personalInfo.linkedinUrl)}"
+            th:href="${personalInfo.linkedinUrl}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <i class="bi bi-linkedin" aria-hidden="true"></i>
+          </a>
+          <a class="icon-btn icon-btn--sm" th:if="${personalInfo != null and not #strings.isEmpty(personalInfo.email)}"
+            th:href="|mailto:${personalInfo.email}|" aria-label="Correo electrónico">
+            <i class="bi bi-envelope" aria-hidden="true"></i>
+          </a>
+          <a class="back-to-top" href="#hero">
+            Volver arriba <i class="bi bi-arrow-up" aria-hidden="true"></i>
+          </a>
+        </nav>
+      </div>
+
+      <p class="site-footer__legal">
+        © <span th:text="${#temporals.format(#temporals.createToday(), 'yyyy')}">2026</span>
+        <span th:text="${personalInfo != null ? personalInfo.firstName + ' ' + personalInfo.lastName : 'Portfolio'}">Diego
+          Dominguez</span> · Todos los derechos reservados.
+      </p>
+    </div>
+  </footer>
+</body>
+
+</html>

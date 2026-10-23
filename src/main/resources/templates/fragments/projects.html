@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <section id="projects" class="section section--alt" th:fragment="projects">
+    <div class="container">
+      <header class="section-head reveal">
+        <p class="eyebrow"><span class="eyebrow-index">04</span> Trabajo reciente</p>
+        <h2 class="section-title">Proyectos</h2>
+        <p class="section-lead">Una selección de cosas que he diseñado, construido y puesto en marcha.</p>
+      </header>
+
+      <div class="row g-4" th:if="${not #lists.isEmpty(projects)}">
+        <div class="col-md-6 col-xl-4" th:each="project : ${projects}">
+          <article class="project-card reveal h-100">
+            <div class="project-media">
+              <div class="project-fallback" aria-hidden="true">
+                <i class="bi bi-window-stack"></i>
+              </div>
+              <img th:if="${not #strings.isEmpty(project.imageUrl)}" th:src="${project.imageUrl}"
+                th:alt="|Vista previa de ${project.title}|" loading="lazy" onerror="this.style.display='none'">
+            </div>
+            <div class="project-body">
+              <h3 class="project-title" th:text="${project.title}">Portfolio Personal</h3>
+              <p class="project-text" th:if="${not #strings.isEmpty(project.description)}"
+                th:text="${project.description}">Descripción del proyecto.</p>
+              <a class="project-link" th:if="${not #strings.isEmpty(project.projectUrl)}"
+                th:href="${project.projectUrl}" target="_blank" rel="noopener noreferrer">
+                Ver proyecto <i class="bi bi-arrow-up-right" aria-hidden="true"></i>
+              </a>
+              <span class="project-link project-link--muted" th:if="${#strings.isEmpty(project.projectUrl)}">
+                En construcción
+              </span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <p class="empty-state" th:if="${#lists.isEmpty(projects)}">
+        <i class="bi bi-inbox me-2" aria-hidden="true"></i>Todavía no hay proyectos publicados.
+      </p>
+    </div>
+  </section>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <section id="education" class="section" th:fragment="education">
+    <div class="container">
+      <header class="section-head reveal">
+        <p class="eyebrow"><span class="eyebrow-index">03</span> Aprendizaje</p>
+        <h2 class="section-title">Formación</h2>
+        <p class="section-lead">Estudios y cursos que sostienen la base técnica de mi trabajo.</p>
+      </header>
+
+      <div class="row g-4" th:if="${not #lists.isEmpty(educations)}">
+        <div class="col-md-6" th:each="education : ${educations}">
+          <article class="education-card reveal h-100">
+            <div class="education-head">
+              <span class="education-icon" aria-hidden="true">
+                <i class="bi bi-mortarboard-fill"></i>
+              </span>
+              <p class="period period--plain">
+                <th:block th:text="${#temporals.format(education.startDate, 'yyyy')}">2015</th:block>
+                <span aria-hidden="true">—</span>
+                <th:block th:if="${education.endDate != null}"
+                  th:text="${#temporals.format(education.endDate, 'yyyy')}">2020</th:block>
+                <span th:if="${education.endDate == null}">Actualidad</span>
+              </p>
+            </div>
+            <h3 class="education-title" th:text="${education.degree}">Ingeniería en Sistemas</h3>
+            <p class="education-org" th:text="${education.institution}">Universidad</p>
+            <p class="education-text" th:if="${not #strings.isEmpty(education.description)}"
+              th:text="${education.description}">Descripción.</p>
+          </article>
+        </div>
+      </div>
+
+      <p class="empty-state" th:if="${#lists.isEmpty(educations)}">
+        <i class="bi bi-inbox me-2" aria-hidden="true"></i>Todavía no hay formación registrada.
+      </p>
+    </div>
+  </section>
+</body>
+
+</html>

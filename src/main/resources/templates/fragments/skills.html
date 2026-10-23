@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <section id="skills" class="section" th:fragment="skills">
+    <div class="container">
+      <header class="section-head reveal">
+        <p class="eyebrow"><span class="eyebrow-index">01</span> Stack técnico</p>
+        <h2 class="section-title">Habilidades</h2>
+        <p class="section-lead">Las herramientas con las que trabajo día a día, del frontend al backend.</p>
+      </header>
+
+      <div class="row g-3 g-lg-4" th:if="${not #lists.isEmpty(skills)}">
+        <div class="col-sm-6 col-xl-4" th:each="skill : ${skills}">
+          <article class="skill-card reveal">
+            <div class="skill-icon" aria-hidden="true">
+              <i th:class="${#strings.isEmpty(skill.iconClass) ? 'fas fa-code' : skill.iconClass}"></i>
+            </div>
+            <div class="skill-body">
+              <div class="skill-top">
+                <h3 class="skill-name" th:text="${skill.name}">Java</h3>
+                <span class="skill-level"
+                  th:text="|${skill.levelPercentage != null ? skill.levelPercentage : 0}%|">80%</span>
+              </div>
+              <div class="skill-bar" role="progressbar" aria-label="Nivel de dominio"
+                th:attr="aria-valuenow=${skill.levelPercentage != null ? skill.levelPercentage : 0},aria-valuemin=0,aria-valuemax=100"
+                th:style="|--level:${skill.levelPercentage != null ? skill.levelPercentage : 0}%|">
+                <span></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <p class="empty-state" th:if="${#lists.isEmpty(skills)}">
+        <i class="bi bi-inbox me-2" aria-hidden="true"></i>Todavía no hay habilidades registradas.
+      </p>
+    </div>
+  </section>
+</body>
+
+</html>

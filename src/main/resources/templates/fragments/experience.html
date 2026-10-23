@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <section id="experience" class="section section--alt" th:fragment="experience">
+    <div class="container">
+      <header class="section-head reveal">
+        <p class="eyebrow"><span class="eyebrow-index">02</span> Trayectoria</p>
+        <h2 class="section-title">Experiencia</h2>
+        <p class="section-lead">Dónde he trabajado, qué he construido y qué he aprendido en el camino.</p>
+      </header>
+
+      <ol class="timeline" th:if="${not #lists.isEmpty(experiences)}">
+        <li class="timeline-item reveal" th:each="experience : ${experiences}">
+          <span class="timeline-marker" aria-hidden="true"></span>
+          <article class="timeline-card">
+            <div class="timeline-top">
+              <div>
+                <h3 class="timeline-title" th:text="${experience.jobTitle}">Desarrollador Full Stack</h3>
+                <p class="timeline-org">
+                  <i class="bi bi-building me-1" aria-hidden="true"></i>
+                  <span th:text="${experience.companyName}">Empresa</span>
+                </p>
+              </div>
+              <p class="period" th:classappend="${experience.endDate == null ? 'is-current' : ''}">
+                <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>
+                <th:block th:text="${#temporals.format(experience.startDate, 'MM/yyyy')}">01/2022</th:block>
+                <span aria-hidden="true">—</span>
+                <th:block th:if="${experience.endDate != null}"
+                  th:text="${#temporals.format(experience.endDate, 'MM/yyyy')}">12/2024</th:block>
+                <span th:if="${experience.endDate == null}">Actualidad</span>
+              </p>
+            </div>
+            <p class="timeline-text" th:if="${not #strings.isEmpty(experience.description)}"
+              th:text="${experience.description}">Descripción del puesto.</p>
+          </article>
+        </li>
+      </ol>
+
+      <p class="empty-state" th:if="${#lists.isEmpty(experiences)}">
+        <i class="bi bi-inbox me-2" aria-hidden="true"></i>Todavía no hay experiencia registrada.
+      </p>
+    </div>
+  </section>
+</body>
+
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <section id="hero" class="hero" th:fragment="hero">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-grid" aria-hidden="true"></div>
+
+    <div class="container position-relative">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+          <p class="eyebrow mb-3">
+            <span class="eyebrow-dot" aria-hidden="true"></span>
+            <span th:text="${personalInfo != null ? personalInfo.title : 'Portfolio personal'}">Portfolio personal</span>
+          </p>
+
+          <h1 class="hero-title">
+            <span th:text="${personalInfo != null ? personalInfo.firstName : 'Hola'}" class="d-block">Hola</span>
+            <span class="text-gradient d-block"
+              th:text="${personalInfo != null ? personalInfo.lastName : 'a mi portfolio'}">Mundo</span>
+          </h1>
+
+          <p class="hero-lead" th:if="${personalInfo != null}" th:text="${personalInfo.profileDescription}">
+            Desarrollador de software apasionado por construir productos claros, rápidos y mantenibles.
+          </p>
+          <p class="hero-lead" th:if="${personalInfo == null}">
+            Todavía no hay información personal cargada. Añádela para que esta landing page cobre vida.
+          </p>
+
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <a class="btn btn-glow" href="#projects">
+              <i class="bi bi-grid-1x2 me-2" aria-hidden="true"></i>Ver proyectos
+            </a>
+            <a class="btn btn-ghost" href="#contact">
+              <i class="bi bi-chat-dots me-2" aria-hidden="true"></i>Hablemos
+            </a>
+          </div>
+
+          <div class="hero-socials" th:if="${personalInfo != null}">
+            <a class="icon-btn" th:if="${not #strings.isEmpty(personalInfo.githubUrl)}"
+              th:href="${personalInfo.githubUrl}" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <i class="bi bi-github" aria-hidden="true"></i>
+            </a>
+            <a class="icon-btn" th:if="${not #strings.isEmpty(personalInfo.linkedinUrl)}"
+              th:href="${personalInfo.linkedinUrl}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <i class="bi bi-linkedin" aria-hidden="true"></i>
+            </a>
+            <a class="icon-btn" th:if="${not #strings.isEmpty(personalInfo.email)}"
+              th:href="|mailto:${personalInfo.email}|" aria-label="Correo electrónico">
+              <i class="bi bi-envelope" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="hero-portrait">
+            <div class="avatar-frame">
+              <div class="avatar-fallback" aria-hidden="true" th:text="${initials}">DD</div>
+              <img class="avatar-photo" th:if="${personalInfo != null and not #strings.isEmpty(personalInfo.profileImageUrl)}"
+                th:src="${personalInfo.profileImageUrl}"
+                th:alt="|Foto de ${personalInfo.firstName} ${personalInfo.lastName}|" onerror="this.style.display='none'">
+            </div>
+
+            <div class="hero-chips" th:if="${not #lists.isEmpty(skills)}" aria-hidden="true">
+              <span class="chip" th:each="skill, iter : ${skills}" th:if="${iter.index < 4}"
+                th:text="${skill.name}">Java</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <dl class="hero-stats reveal" th:if="${personalInfo != null}">
+        <div class="stat">
+          <dt class="stat-label">Experiencia</dt>
+          <dd class="stat-value"
+            th:text="${personalInfo.yearsOfExperience != null ? '+' + personalInfo.yearsOfExperience : '—'}">+5</dd>
+        </div>
+        <div class="stat">
+          <dt class="stat-label">Habilidades</dt>
+          <dd class="stat-value" th:text="${#lists.size(skills)}">7</dd>
+        </div>
+        <div class="stat">
+          <dt class="stat-label">Proyectos</dt>
+          <dd class="stat-value" th:text="${#lists.size(projects)}">2</dd>
+        </div>
+        <div class="stat">
+          <dt class="stat-label">Roles</dt>
+          <dd class="stat-value" th:text="${#lists.size(experiences)}">2</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+</body>
+
+</html>

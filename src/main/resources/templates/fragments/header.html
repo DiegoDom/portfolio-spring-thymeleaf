@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+  <header class="site-nav" th:fragment="header">
+    <nav class="navbar navbar-expand-lg" aria-label="Navegación principal">
+      <div class="container">
+        <a class="navbar-brand brand" href="#hero">
+          <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+          <span class="brand-name">
+            <span th:text="${personalInfo != null ? personalInfo.firstName : 'Diego'}">Diego</span>
+            <span class="brand-dot" aria-hidden="true">.</span>
+            <span th:text="${personalInfo != null ? personalInfo.lastName : 'Dom'}">Dom</span>
+          </span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+          aria-controls="mainNav" aria-expanded="false" aria-label="Abrir menú de navegación">
+          <i class="bi bi-list" aria-hidden="true"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+            <li class="nav-item"><a class="nav-link" href="#hero">Inicio</a></li>
+            <li class="nav-item"><a class="nav-link" href="#skills">Habilidades</a></li>
+            <li class="nav-item"><a class="nav-link" href="#experience">Experiencia</a></li>
+            <li class="nav-item"><a class="nav-link" href="#education">Formación</a></li>
+            <li class="nav-item"><a class="nav-link" href="#projects">Proyectos</a></li>
+            <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+              <a class="btn btn-glow btn-sm w-100" href="#contact">
+                <i class="bi bi-send me-1" aria-hidden="true"></i>Contacto
+              </a>
+            </li>
+            <li class="nav-item mt-2 mt-lg-0">
+              <a class="icon-btn icon-btn--sm" th:href="@{/personal-info/form}"
+                title="Editar información personal" aria-label="Editar información personal">
+                <i class="bi bi-pencil-square" aria-hidden="true"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+</body>
+
+</html>

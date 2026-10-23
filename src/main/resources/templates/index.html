@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
+
+<head th:replace="~{fragments/head :: head('Portfolio')}"></head>
+
+<body>
+  <a class="skip-link" href="#hero">Saltar al contenido</a>
+
+  <header th:replace="~{fragments/header :: header}"></header>
+
+  <main>
+    <section th:replace="~{fragments/hero :: hero}"></section>
+    <section th:replace="~{fragments/skills :: skills}"></section>
+    <section th:replace="~{fragments/experience :: experience}"></section>
+    <section th:replace="~{fragments/education :: education}"></section>
+    <section th:replace="~{fragments/projects :: projects}"></section>
+    <section th:replace="~{fragments/contact :: contact}"></section>
+  </main>
+
+  <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:src="@{/js/landing.js}"></script>
+</body>
+
+</html>
