@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: layout('Habilidades', 'skills', ~{::content})}">
+
+<body>
+  <div th:fragment="content">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+      <div>
+        <h1 class="h3 mb-1">Habilidades</h1>
+        <p class="text-muted mb-0">Gestiona las habilidades que se muestran en tu portfolio.</p>
+      </div>
+      <a th:href="@{/admin/skills/new}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Nueva habilidad
+      </a>
+    </div>
+
+    <div class="card shadow-sm border-0" th:if="${not #lists.isEmpty(skills)}">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Habilidad</th>
+              <th scope="col" style="min-width: 180px;">Nivel</th>
+              <th scope="col">Icono</th>
+              <th scope="col" class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="skill : ${skills}">
+              <td class="text-muted" th:text="${skill.id}">1</td>
+              <td class="fw-semibold" th:text="${skill.name}">Java</td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="progress flex-grow-1" role="progressbar" aria-label="Nivel de la habilidad"
+                    aria-valuemin="0" aria-valuemax="100"
+                    th:attr="aria-valuenow=${skill.levelPercentage != null ? skill.levelPercentage : 0}"
+                    style="height: 8px;">
+                    <div class="progress-bar"
+                      th:style="|width: ${skill.levelPercentage != null ? skill.levelPercentage : 0}%|"></div>
+                  </div>
+                  <span class="text-muted small"
+                    th:text="${skill.levelPercentage != null ? skill.levelPercentage + '%' : '—'}">80%</span>
+                </div>
+              </td>
+              <td>
+                <code th:if="${not #strings.isEmpty(skill.iconClass)}" th:text="${skill.iconClass}">fab fa-java</code>
+                <span th:if="${#strings.isEmpty(skill.iconClass)}" class="text-muted">—</span>
+              </td>
+              <td class="text-end">
+                <div class="d-inline-flex gap-2">
+                  <a th:href="@{/admin/skills/{id}/edit(id=${skill.id})}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil me-1" aria-hidden="true"></i>Editar
+                  </a>
+                  <form th:action="@{/admin/skills/{id}/delete(id=${skill.id})}" method="post"
+                    onsubmit="return confirm('¿Seguro que deseas eliminar esta habilidad? Esta acción no se puede deshacer.');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                      <i class="bi bi-trash me-1" aria-hidden="true"></i>Eliminar
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="text-center py-5" th:if="${#lists.isEmpty(skills)}">
+      <i class="bi bi-inbox display-6 text-muted" aria-hidden="true"></i>
+      <p class="text-muted mt-2 mb-3">Todavía no hay habilidades registradas.</p>
+      <a th:href="@{/admin/skills/new}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Crear la primera habilidad
+      </a>
+    </div>
+  </div>
+</body>
+
+</html>

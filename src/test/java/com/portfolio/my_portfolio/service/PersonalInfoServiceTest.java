@@ -32,7 +32,7 @@ class PersonalInfoServiceTest extends ServiceIntegrationTestSupport {
     assertThat(personalInfo.getProfileDescription()).isEqualTo(
         "Apasionado por el desarrollo web con experiencia en Java, Spring Boot y React. "
             + "Disfruto construyendo soluciones robustas y escalables.");
-    assertThat(personalInfo.getProfileImageUrl()).isEqualTo("img/profile-placeholder.jpg");
+    assertThat(personalInfo.getProfileImageUrl()).isEqualTo("/img/profile-placeholder.jpg");
     assertThat(personalInfo.getYearsOfExperience()).isEqualTo(5);
     assertThat(personalInfo.getEmail()).isEqualTo("juan.perez@example.com");
     assertThat(personalInfo.getPhone()).isEqualTo("+523348385911");

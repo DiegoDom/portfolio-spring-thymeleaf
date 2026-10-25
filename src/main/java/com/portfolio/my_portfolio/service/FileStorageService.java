@@ -18,7 +18,7 @@ public class FileStorageService {
 
   public String storeFile(MultipartFile file) throws IOException {
     if (file.isEmpty()) {
-      throw new IOException("The uploaded file it's empty");
+      throw new IOException("El archivo subido está vacío");
     }
 
     String ogFilename = file.getOriginalFilename();

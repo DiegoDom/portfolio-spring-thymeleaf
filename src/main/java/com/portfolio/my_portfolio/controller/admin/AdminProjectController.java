@@ -1,7 +1,6 @@
-package com.portfolio.my_portfolio.controller;
+package com.portfolio.my_portfolio.controller.admin;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -16,146 +15,139 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.portfolio.my_portfolio.dto.ProjectDto;
 import com.portfolio.my_portfolio.dto.ProjectMapper;
 import com.portfolio.my_portfolio.model.Project;
 import com.portfolio.my_portfolio.service.FileStorageService;
-import com.portfolio.my_portfolio.service.IPersonalInfoService;
-import com.portfolio.my_portfolio.service.ProjectService;
+import com.portfolio.my_portfolio.service.ProjectServiceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/projects")
-public class ProjectController {
-  private final ProjectService projectService;
-  private final FileStorageService fileStorageService;
-  private final IPersonalInfoService personalInfoService;
+@RequestMapping("/admin/projects")
+public class AdminProjectController {
 
-  @GetMapping({"/", ""})
-  public String getAll(Model model) {
-    List<ProjectDto> projects = projectService.findAll().stream().map(ProjectMapper::tDto).toList();
-    model.addAttribute("projects", projects);
-    return "projects/index";
+  private final ProjectServiceImpl projectService;
+  private final FileStorageService fileStorageService;
+  private final PersonalInfoIdResolver personalInfoIdResolver;
+
+  @GetMapping({ "", "/" })
+  public String list(Model model) {
+    model.addAttribute("projects", projectService.findAll().stream().map(ProjectMapper::tDto).toList());
+    return "admin/projects/index";
   }
 
   @GetMapping("/new")
   public String showCreateForm(Model model) {
-    model.addAttribute("project", new ProjectDto());
+    ProjectDto project = new ProjectDto();
+    project.setPersonalInfoId(personalInfoIdResolver.requireId());
+    model.addAttribute("project", project);
     model.addAttribute("editMode", false);
-    return "projects/form";
+    return "admin/projects/form";
   }
 
-  @PostMapping("/add")
-  public String addProject(@Valid @ModelAttribute("project") ProjectDto projectDto,
+  @PostMapping
+  public String create(@Valid @ModelAttribute("project") ProjectDto projectDto,
       BindingResult bindingResult,
-      @RequestParam("file") MultipartFile file,
-      Model model) {
+      @RequestParam(value = "file", required = false) MultipartFile file,
+      Model model,
+      RedirectAttributes redirectAttributes) {
 
     if (bindingResult.hasErrors()) {
       model.addAttribute("editMode", false);
       model.addAttribute("formErrors", true);
-      return "projects/form";
+      return "admin/projects/form";
     }
 
     try {
       if (file != null && !file.isEmpty()) {
-        String imageUrl = fileStorageService.storeFile(file);
-        projectDto.setImageUrl(imageUrl);
+        projectDto.setImageUrl(fileStorageService.storeFile(file));
       }
 
+      projectDto.setId(null);
       Project project = ProjectMapper.toProject(projectDto);
-      project.setPersonalInfoId(currentPersonalInfoId());
+      project.setPersonalInfoId(personalInfoIdResolver.requireId());
       projectService.save(project);
 
-      return "redirect:/projects/";
+      redirectAttributes.addFlashAttribute("success", "Proyecto creado correctamente.");
+      return "redirect:/admin/projects";
     } catch (IOException e) {
       model.addAttribute("error", "Error al subir la imagen. Inténtalo de nuevo.");
       model.addAttribute("editMode", false);
       model.addAttribute("formErrors", true);
-      return "projects/form";
+      return "admin/projects/form";
     }
   }
 
-  @GetMapping("/edit/{id}")
+  @GetMapping("/{id}/edit")
   public String showEditForm(@PathVariable Long id, Model model) {
-    Optional<Project> projectOpt = projectService.findById(id);
-
-    if (projectOpt.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + id);
-    }
-
-    ProjectDto projectDto = ProjectMapper.tDto(projectOpt.get());
-    model.addAttribute("project", projectDto);
+    ProjectDto project = ProjectMapper.tDto(findOrThrow(id));
+    model.addAttribute("project", project);
     model.addAttribute("editMode", true);
-    return "projects/form";
+    return "admin/projects/form";
   }
 
-  @PostMapping("/update/{id}")
-  public String updateProject(@PathVariable Long id,
+  @PostMapping("/{id}")
+  public String update(@PathVariable Long id,
       @Valid @ModelAttribute("project") ProjectDto projectDto,
       BindingResult bindingResult,
       @RequestParam(value = "file", required = false) MultipartFile file,
-      Model model) {
+      Model model,
+      RedirectAttributes redirectAttributes) {
 
-    Optional<Project> existingOpt = projectService.findById(id);
-    if (existingOpt.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + id);
-    }
+    Project existing = findOrThrow(id);
 
     if (bindingResult.hasErrors()) {
       model.addAttribute("editMode", true);
       model.addAttribute("formErrors", true);
       if (projectDto.getImageUrl() == null || projectDto.getImageUrl().isBlank()) {
-        projectDto.setImageUrl(existingOpt.get().getImageUrl());
+        projectDto.setImageUrl(existing.getImageUrl());
       }
-      return "projects/form";
+      return "admin/projects/form";
     }
 
     try {
       if (file != null && !file.isEmpty()) {
-        String imageUrl = fileStorageService.storeFile(file);
-        projectDto.setImageUrl(imageUrl);
+        projectDto.setImageUrl(fileStorageService.storeFile(file));
       } else {
-        projectDto.setImageUrl(existingOpt.get().getImageUrl());
+        projectDto.setImageUrl(existing.getImageUrl());
       }
 
       projectDto.setId(id);
       Project project = ProjectMapper.toProject(projectDto);
-      project.setPersonalInfoId(currentPersonalInfoId());
+      project.setPersonalInfoId(personalInfoIdResolver.requireId());
       projectService.save(project);
 
-      return "redirect:/projects/";
+      redirectAttributes.addFlashAttribute("success", "Proyecto actualizado correctamente.");
+      return "redirect:/admin/projects";
     } catch (IOException e) {
       model.addAttribute("error", "Error al subir la imagen. Inténtalo de nuevo.");
       model.addAttribute("editMode", true);
       model.addAttribute("formErrors", true);
       if (projectDto.getImageUrl() == null || projectDto.getImageUrl().isBlank()) {
-        projectDto.setImageUrl(existingOpt.get().getImageUrl());
+        projectDto.setImageUrl(existing.getImageUrl());
       }
-      return "projects/form";
+      return "admin/projects/form";
     }
   }
 
-  @PostMapping("/delete/{id}")
-  public String deleteProject(@PathVariable Long id) {
-    Optional<Project> projectOpt = projectService.findById(id);
-
-    if (projectOpt.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id: " + id);
-    }
-
+  @PostMapping("/{id}/delete")
+  public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    findOrThrow(id);
     projectService.deleteById(id);
-    return "redirect:/projects/";
+    redirectAttributes.addFlashAttribute("success", "Proyecto eliminado correctamente.");
+    return "redirect:/admin/projects";
   }
 
-  private Long currentPersonalInfoId() {
-    return personalInfoService.find()
-        .map(personalInfo -> personalInfo.getId())
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT,
-            "Personal info is not configured"));
+  private Project findOrThrow(Long id) {
+    Optional<Project> project = projectService.findById(id);
+    if (project.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Proyecto no encontrado con id: " + id);
+    }
+    return project.get();
   }
 }

@@ -14,41 +14,41 @@ import lombok.NoArgsConstructor;
 public class PersonalInfoDto {
   private Long id;
 
-  @NotBlank(message = "The first name cannot be empty")
-  @Size(max = 100, message = "The first name cannot exceed 100 characters")
+  @NotBlank(message = "El nombre no puede estar vacío")
+  @Size(max = 100, message = "El nombre no puede superar los 100 caracteres")
   private String firstName;
 
-  @NotBlank(message = "The last name cannot be empty")
-  @Size(max = 100, message = "The last name cannot exceed 100 characters")
+  @NotBlank(message = "Los apellidos no pueden estar vacíos")
+  @Size(max = 100, message = "Los apellidos no pueden superar los 100 caracteres")
   private String lastName;
 
-  @NotBlank(message = "The title cannot be empty")
-  @Size(max = 255, message = "The title cannot exceed 255 characters")
+  @NotBlank(message = "El título profesional no puede estar vacío")
+  @Size(max = 255, message = "El título profesional no puede superar los 255 caracteres")
   private String title;
 
-  @NotBlank(message = "The description cannot be empty")
+  @NotBlank(message = "La descripción no puede estar vacía")
   private String profileDescription;
 
-  @Size(max = 500, message = "The profile image URL cannot exceed 500 characters")
+  @Size(max = 500, message = "La URL de la imagen de perfil no puede superar los 500 caracteres")
   private String profileImageUrl;
 
-  @Min(value = 0, message = "The years of experience cannot be less than zero")
+  @Min(value = 0, message = "Los años de experiencia no pueden ser negativos")
   private Integer yearsOfExperience;
 
-  @NotBlank(message = "The email cannot be empty")
-  @Email(message = "The email is not valid")
-  @Size(max = 255, message = "The email cannot exceed 255 characters")
+  @NotBlank(message = "El correo electrónico no puede estar vacío")
+  @Email(message = "El correo electrónico no es válido")
+  @Size(max = 255, message = "El correo electrónico no puede superar los 255 caracteres")
   private String email;
 
-  @NotBlank(message = "The phone cannot be empty")
-  @Size(max = 50, message = "The phone cannot exceed 50 characters")
+  @NotBlank(message = "El teléfono no puede estar vacío")
+  @Size(max = 50, message = "El teléfono no puede superar los 50 caracteres")
   private String phone;
 
-  @URL(message = "The LinkedIn URL is not valid")
-  @Size(max = 500, message = "The LinkedIn URL cannot exceed 500 characters")
+  @URL(message = "La URL de LinkedIn no es válida")
+  @Size(max = 500, message = "La URL de LinkedIn no puede superar los 500 caracteres")
   private String linkedinUrl;
 
-  @URL(message = "The GitHub URL is not valid")
-  @Size(max = 500, message = "The GitHub URL cannot exceed 500 characters")
+  @URL(message = "La URL de GitHub no es válida")
+  @Size(max = 500, message = "La URL de GitHub no puede superar los 500 caracteres")
   private String githubUrl;
 }

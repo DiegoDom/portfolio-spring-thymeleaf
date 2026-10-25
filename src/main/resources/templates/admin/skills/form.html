@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+  th:replace="~{admin/layout :: layout(${editMode ? 'Editar habilidad' : 'Nueva habilidad'}, 'skills', ~{::content})}">
+
+<body>
+  <div th:fragment="content">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-2">
+      <div>
+        <h1 class="h3 mb-1" th:text="${editMode} ? 'Editar habilidad' : 'Nueva habilidad'">Habilidad</h1>
+        <p class="text-muted mb-0"
+          th:text="${editMode} ? 'Actualiza los datos de la habilidad seleccionada.' : 'Añade una habilidad a tu portfolio.'">
+          Datos de la habilidad
+        </p>
+      </div>
+      <a th:href="@{/admin/skills}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>Volver al listado
+      </a>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <div th:if="${formErrors != null and formErrors}" class="alert alert-danger d-flex align-items-start gap-2"
+              role="alert">
+              <i class="bi bi-exclamation-triangle-fill mt-1" aria-hidden="true"></i>
+              <div>Revisa los campos obligatorios. Los mensajes de error aparecen junto a cada campo.</div>
+            </div>
+
+            <form th:action="${editMode} ? @{/admin/skills/{id}(id=${skill.id})} : @{/admin/skills}"
+              th:object="${skill}" method="post" novalidate>
+              <input type="hidden" th:field="*{id}">
+              <input type="hidden" th:field="*{personalInfoId}">
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <label for="name" class="form-label">Nombre</label>
+                  <input type="text" class="form-control" id="name" placeholder="Ej. Java"
+                    th:field="*{name}" th:errorclass="is-invalid" maxlength="100">
+                  <div class="invalid-feedback" th:errors="*{name}"></div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="levelPercentage" class="form-label">Nivel (%)</label>
+                  <input type="number" class="form-control" id="levelPercentage" min="0" max="100" step="1"
+                    placeholder="Ej. 80" th:field="*{levelPercentage}" th:errorclass="is-invalid">
+                  <div class="invalid-feedback" th:errors="*{levelPercentage}"></div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="iconClass" class="form-label">Icono (clase CSS)</label>
+                  <input type="text" class="form-control" id="iconClass" placeholder="Ej. fab fa-java"
+                    th:field="*{iconClass}" th:errorclass="is-invalid" maxlength="100">
+                  <div class="form-text">Opcional. Por ejemplo, una clase de Bootstrap Icons o Font Awesome.</div>
+                  <div class="invalid-feedback" th:errors="*{iconClass}"></div>
+                </div>
+              </div>
+
+              <div class="d-flex flex-wrap gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-check-lg me-1" aria-hidden="true"></i>
+                  <span th:text="${editMode} ? 'Guardar cambios' : 'Crear habilidad'">Guardar</span>
+                </button>
+                <a th:href="@{/admin/skills}" class="btn btn-outline-secondary">Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

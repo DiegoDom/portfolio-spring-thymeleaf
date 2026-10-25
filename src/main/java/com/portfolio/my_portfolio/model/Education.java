@@ -16,23 +16,23 @@ import java.time.LocalDate;
 public class Education {
     private Long id;
 
-    @NotBlank(message = "The degree cannot be empty")
-    @Size(max = 255, message = "The degree cannot exceed 255 characters")
+    @NotBlank(message = "El título no puede estar vacío")
+    @Size(max = 255, message = "El título no puede superar los 255 caracteres")
     private String degree;
 
-    @NotBlank(message = "The institution cannot be empty")
-    @Size(max = 255, message = "The institution cannot exceed 255 characters")
+    @NotBlank(message = "La institución no puede estar vacía")
+    @Size(max = 255, message = "La institución no puede superar los 255 caracteres")
     private String institution;
 
-    @NotNull(message = "The start date cannot be null")
-    @PastOrPresent(message = "The start date cannot be a future date")
+    @NotNull(message = "La fecha de inicio no puede ser nula")
+    @PastOrPresent(message = "La fecha de inicio no puede ser futura")
     private LocalDate startDate;
 
-    @PastOrPresent(message = "The end date cannot be a future date")
+    @PastOrPresent(message = "La fecha de fin no puede ser futura")
     private LocalDate endDate;
 
     private String description;
 
-    @NotNull(message = "The personal info id cannot be null")
+    @NotNull(message = "El id de la información personal no puede ser nulo")
     private Long personalInfoId;
 }

@@ -13,17 +13,17 @@ import lombok.NoArgsConstructor;
 public class SkillDto {
   private Long id;
 
-  @NotBlank(message = "The name cannot be empty")
-  @Size(max = 100, message = "The name cannot exceed 100 characters")
+  @NotBlank(message = "El nombre no puede estar vacío")
+  @Size(max = 100, message = "El nombre no puede superar los 100 caracteres")
   private String name;
 
-  @Min(value = 0, message = "The level percentage cannot be less than zero")
-  @Max(value = 100, message = "The level percentage cannot be greater than 100")
+  @Min(value = 0, message = "El nivel no puede ser menor que 0")
+  @Max(value = 100, message = "El nivel no puede ser mayor que 100")
   private Integer levelPercentage;
 
-  @Size(max = 100, message = "The icon class cannot exceed 100 characters")
+  @Size(max = 100, message = "La clase del icono no puede superar los 100 caracteres")
   private String iconClass;
 
-  @NotNull(message = "The personal info id cannot be null")
+  @NotNull(message = "El id de la información personal no puede ser nulo")
   private Long personalInfoId;
 }

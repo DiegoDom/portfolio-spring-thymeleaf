@@ -16,23 +16,23 @@ import java.time.LocalDate;
 public class Experience {
     private Long id;
 
-    @NotBlank(message = "The job title cannot be empty")
-    @Size(max = 255, message = "The job title cannot exceed 255 characters")
+    @NotBlank(message = "El puesto de trabajo no puede estar vacío")
+    @Size(max = 255, message = "El puesto de trabajo no puede superar los 255 caracteres")
     private String jobTitle;
 
-    @NotBlank(message = "The company name cannot be empty")
-    @Size(max = 255, message = "The company name cannot exceed 255 characters")
+    @NotBlank(message = "El nombre de la empresa no puede estar vacío")
+    @Size(max = 255, message = "El nombre de la empresa no puede superar los 255 caracteres")
     private String companyName;
 
-    @NotNull(message = "The start date cannot be null")
-    @PastOrPresent(message = "The start date cannot be a future date")
+    @NotNull(message = "La fecha de inicio no puede ser nula")
+    @PastOrPresent(message = "La fecha de inicio no puede ser futura")
     private LocalDate startDate;
 
-    @PastOrPresent(message = "The end date cannot be a future date")
+    @PastOrPresent(message = "La fecha de fin no puede ser futura")
     private LocalDate endDate;
 
     private String description;
 
-    @NotNull(message = "The personal info id cannot be null")
+    @NotNull(message = "El id de la información personal no puede ser nulo")
     private Long personalInfoId;
 }
