@@ -21,3 +21,6 @@ INSERT INTO experiences (job_title, company_name, start_date, end_date, descript
 INSERT INTO projects (title, description, image_url, personal_info_id) VALUES
 ('Portfolio Personal', 'Desarrollo de un portfolio personal utilizando React y Spring Boot para mostrar proyectos y habilidades.', '/img/portfolio-project.jpg', 1),
 ('Sistema de Gestión de Inventarios', 'Aplicación web para la gestión de inventarios en tiempo real, con integración a bases de datos PostgreSQL.', '/img/inventory-system.jpg', 1);
+
+
+INSERT INTO users (username, password, enabled) VALUES ('admin', '$2a$10$9dXBacaSK7XSZzPaY0yCy.oD/aYR.exyZ1qkXxohy85ad/k8o4A4i', TRUE);
