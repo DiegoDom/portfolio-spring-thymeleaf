@@ -14,7 +14,6 @@ import com.portfolio.my_portfolio.exception.ValidationException;
 import com.portfolio.my_portfolio.model.Project;
 import com.portfolio.my_portfolio.repository.ProjectRepositoryImpl;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 
 @Service
