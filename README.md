@@ -5,7 +5,7 @@ Aplicación web para gestionar y mostrar un portfolio personal: datos del perfil
 Incluye tres superficies:
 
 - **Sitio público** en `/`, renderizado con Thymeleaf.
-- **Panel de administración** en `/admin/**`, con vistas y formularios para el CRUD completo.
+- **Panel de administración** en `/admin/**`, con vistas y formularios para el CRUD completo, protegido con login.
 - **API REST** en `/api/test/**`, útil para pruebas y para el consumo desde otros clientes.
 
 Construida con **Spring Boot 4.1.1** y **Java 21**, con persistencia en **PostgreSQL** mediante **Spring Data JDBC** (`JdbcTemplate`), sin ORM.
@@ -16,6 +16,7 @@ Construida con **Spring Boot 4.1.1** y **Java 21**, con persistencia en **Postgr
 
 - Sitio público con perfil, habilidades, formación, experiencia y proyectos.
 - Panel de administración en español, con Bootstrap 5 y Bootstrap Icons.
+- Autenticación del panel con Spring Security (form login, BCrypt y logout).
 - CRUD de habilidades, formación, experiencia y proyectos; el perfil personal es un singleton editable.
 - Validación con Bean Validation y mensajes de error en español.
 - API REST para los cinco recursos.
@@ -35,11 +36,12 @@ Construida con **Spring Boot 4.1.1** y **Java 21**, con persistencia en **Postgr
 | Spring Boot | 4.1.1 |
 | Persistencia | `spring-boot-starter-data-jdbc` (`JdbcTemplate`) |
 | Web | `spring-boot-starter-webmvc` + Thymeleaf |
+| Seguridad | `spring-boot-starter-security` (form login + BCrypt) |
 | UI | Bootstrap 5 y Bootstrap Icons (CDN) |
 | Validación | `spring-boot-starter-validation` (Bean Validation) |
 | Base de datos | PostgreSQL 16 (Alpine) |
 | Driver | `org.postgresql:postgresql` |
-| Tests | `spring-boot-starter-test`, Testcontainers, MockMvc |
+| Tests | `spring-boot-starter-test`, `spring-boot-starter-security-test`, Testcontainers, MockMvc |
 | Lombok | `org.projectlombok:lombok` (opcional) |
 | Build | Maven (con wrapper `mvnw`) |
 | DevTools | `spring-boot-devtools` (recarga en caliente) |
@@ -99,9 +101,12 @@ La aplicación queda disponible en:
 
 ```
 Sitio público:  http://localhost:8080/
+Login admin:    http://localhost:8080/auth/login
 Panel admin:    http://localhost:8080/admin
 API REST:       http://localhost:8080/api/test
 ```
+
+Credenciales de desarrollo del panel: **`admin` / `1Qwerty`**, sembradas en `data.sql`. Cámbialas antes de exponer la aplicación.
 
 ### 3. Probar la API
 
@@ -127,10 +132,13 @@ curl -X DELETE http://localhost:8080/api/test/projects/1
 
 ## Panel de administración
 
-Todas las rutas del panel viven bajo `/admin/**`. **Todavía no hay Spring Security**: el panel es público y se agrupa bajo ese prefijo para poder protegerlo más adelante. El sitio público (`/`) no depende del panel.
+Todas las rutas del panel viven bajo `/admin/**` y requieren autenticación. Spring Security usa **form login** en `/auth/login` (plantilla `templates/auth/form-login.html`) contra la tabla `users`; las contraseñas se almacenan con **BCrypt**. `POST /logout` invalida la sesión y vuelve a `/auth/login?logout`. El sitio público (`/`) y la API (`/api/test/**`) siguen siendo públicos.
 
 | Método | Ruta | Descripción |
 |---|---|---|
+| `GET` | `/auth/login` | Formulario de inicio de sesión (público) |
+| `POST` | `/auth/login` | Procesa el login (Spring Security) |
+| `POST` | `/logout` | Cierra la sesión |
 | `GET` | `/admin` | Dashboard con contadores y accesos rápidos |
 | `GET` | `/admin/personal-info` | Formulario del perfil (singleton) |
 | `POST` | `/admin/personal-info` | Guarda el perfil |
@@ -178,6 +186,8 @@ file.upload.dir=src/main/resources/static/img
 | `spring.sql.init.mode=always` | Ejecuta `schema.sql` y `data.sql` en cada arranque. |
 | `file.upload.dir` | Directorio donde se guardan las imágenes subidas desde el panel. |
 
+La seguridad no se configura en `application.properties` sino en `config/WebSecurityConfig`: form login en `/auth/login`, logout en `/logout`, BCrypt, reglas de autorización y exención de CSRF para `/api/test/**`.
+
 > Las credenciales están en texto plano y son **solo para desarrollo**. En producción deben inyectarse por variables de entorno (`SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`) o un gestor de secretos.
 
 ---
@@ -198,7 +208,8 @@ my-portfolio/
     │   │   │   ├── Skill.java
     │   │   │   ├── Education.java
     │   │   │   ├── Experience.java
-    │   │   │   └── Project.java
+    │   │   │   ├── Project.java
+    │   │   │   └── User.java
     │   │   ├── dto/                 # DTOs y mappers para vistas/API
     │   │   ├── repository/          # Interfaces + implementaciones JDBC
     │   │   │   ├── ISkillRepository.java
@@ -211,6 +222,7 @@ my-portfolio/
     │   │   │   └── ...
     │   │   ├── controller/          # Vistas públicas
     │   │   │   ├── IndexController.java
+    │   │   │   ├── LoginController.java
     │   │   │   └── admin/           # Panel bajo /admin/**
     │   │   │       ├── AdminHomeController.java
     │   │   │       ├── AdminPersonalInfoController.java
@@ -225,6 +237,7 @@ my-portfolio/
     │   │   │   ├── EducationTestController.java
     │   │   │   ├── ExperiencesTestController.java
     │   │   │   └── PersonalInfoTestController.java
+    │   │   ├── config/              # WebSecurityConfig (login, logout, CSRF)
     │   │   └── exception/           # ValidationException y handler global
     │   └── resources/
     │       ├── application.properties
@@ -233,11 +246,13 @@ my-portfolio/
     │       ├── static/img/          # Imágenes subidas desde el panel
     │       └── templates/
     │           ├── index.html       # Sitio público
+    │           ├── auth/            # Formulario de login
     │           ├── admin/           # Layout, dashboard y CRUDs del panel
     │           ├── fragments/       # Fragmentos compartidos del sitio público
     │           └── errors/          # Páginas de error
     └── test/
         └── java/com/portfolio/my_portfolio/
+            ├── controller/          # LoginControllerTest
             ├── controller/admin/    # Tests MockMvc del panel
             ├── model/               # Validación de modelos
             ├── service/             # Tests de integración de servicios
@@ -250,6 +265,7 @@ my-portfolio/
 - **`dto`** — DTOs y mappers estáticos entre modelos y formularios/vistas.
 - **`repository`** — Interfaz (`I*Repository`) + implementación (`*RepositoryImpl`) con `JdbcTemplate`. Operaciones `save` (insert con `GeneratedKeyHolder` o update según exista `id`), `findById`, `findAll` y `deleteById`.
 - **`service`** — Interfaz (`I*Service`) + implementación (`*ServiceImpl`). Valida con Bean Validation, delega en el repositorio y centraliza el almacenamiento de archivos.
+- **`config`** — `WebSecurityConfig`: cadena de filtros, form login/logout, BCrypt y reglas de autorización.
 - **`controller`** — Controladores MVC de Thymeleaf. El sitio público usa `IndexController`; el panel usa los controladores de `controller/admin`.
 - **`rest`** — Controladores `@RestController` que exponen las operaciones HTTP sobre las implementaciones de servicio.
 
@@ -312,6 +328,8 @@ personal_info (id, first_name, last_name, title, profile_description,
       ├── educations (id, degree, institution, start_date, end_date, description, personal_info_id)
       ├── experiences(id, job_title, company_name, start_date, end_date, description, personal_info_id)
       └── projects   (id, title, description, image_url, project_url, personal_info_id)
+
+users (id, username, password, enabled)   # credenciales del panel, independiente del contenido
 ```
 
 | Tabla | Campos | Notas |
@@ -321,12 +339,13 @@ personal_info (id, first_name, last_name, title, profile_description,
 | `educations` | `id`, `degree`, `institution`, `start_date`, `end_date`, `description`, `personal_info_id` | `end_date` puede ser `NULL` (formación en curso). |
 | `experiences` | `id`, `job_title`, `company_name`, `start_date`, `end_date`, `description`, `personal_info_id` | `end_date` `NULL` indica que el puesto es actual. |
 | `projects` | `id`, `title`, `description`, `image_url`, `project_url`, `personal_info_id` | — |
+| `users` | `id`, `username`, `password`, `enabled` | Credenciales del panel. `username` es único y `password` guarda un hash BCrypt. |
 
 ---
 
 ## Datos de ejemplo
 
-`src/main/resources/data.sql` inserta datos de muestra: 1 registro de información personal, 7 habilidades, 2 educaciones, 2 experiencias y 2 proyectos.
+`src/main/resources/data.sql` inserta datos de muestra: 1 registro de información personal, 7 habilidades, 2 educaciones, 2 experiencias, 2 proyectos y 1 usuario (`admin` / `1Qwerty`).
 
 Las rutas de las imágenes sembradas empiezan por `/` (por ejemplo, `/img/profile-placeholder.jpg`) para que funcionen tanto en el sitio público como en las vistas anidadas del panel.
 
@@ -345,8 +364,10 @@ Incluye:
 - `MyPortfolioApplicationTests` — carga del contexto.
 - `ModelValidationTest` — anotaciones de Bean Validation de los modelos, sin base de datos.
 - `Service*Test` — integración de los servicios contra PostgreSQL.
-- `AdminViewsTest` — carga de `/` y de las vistas del panel con MockMvc.
-- `AdminCrudTest` — flujos de creación, actualización y borrado de todos los recursos, validación y 404.
+- `LoginControllerTest` — página de login, protección de `/admin/**`, credenciales válidas/incorrectas y logout.
+- `UserServiceTest` — CRUD de usuarios, hashing BCrypt y `loadUserByUsername`.
+- `AdminViewsTest` — carga de `/` y de las vistas del panel con MockMvc (autenticado con `@WithMockUser`).
+- `AdminCrudTest` — flujos de creación, actualización y borrado de todos los recursos, validación y 404, con CSRF.
 
 Docker debe estar en marcha para ejecutar los tests.
 
@@ -355,9 +376,11 @@ Docker debe estar en marcha para ejecutar los tests.
 ## Notas importantes
 
 - **Los datos se reinician en cada arranque.** `schema.sql` empieza con `DROP TABLE IF EXISTS` y `spring.sql.init.mode=always` ejecuta ambos scripts en cada inicio, por lo que las tablas se recrean y `data.sql` vuelve a poblarlas. Los registros creados desde el panel o la API se pierden al reiniciar. Para conservar datos reales, cambia `spring.sql.init.mode` a `never` y migra el esquema con una herramienta como Flyway o Liquibase.
-- **El panel no tiene autenticación todavía.** `/admin/**` está agrupado para poder protegerlo con Spring Security, pero actualmente cualquiera puede acceder. Añade seguridad antes de exponerlo.
+- **Credenciales de desarrollo.** `data.sql` siembra el usuario `admin` con contraseña `1Qwerty` (hash BCrypt). Cámbialas antes de desplegar; como la base se recrea en cada arranque, cualquier usuario añadido se pierde.
+- **Autorización básica.** La tabla `users` no tiene columna `role`: todo usuario autenticado recibe `ROLE_ADMIN`. No hay registro ni CRUD de usuarios en el panel.
 - **`spring.jpa.properties.hibernate.dialect` no tiene efecto.** El proyecto usa `spring-boot-starter-data-jdbc` y no incluye JPA/Hibernate; esa propiedad es configuración muerta.
 - **Sin CORS configurado.** Si un frontend se sirve en otro origen, hay que añadir una configuración de CORS.
+- **API pública y sin CSRF.** `/api/test/**` no usa sesión y está exento de CSRF para que los `POST`/`DELETE` con `curl` funcionen. No apliques esa exención a endpoints autenticados; el panel sí exige token CSRF.
 - **Validación de entrada.** Los DTOs y modelos usan Bean Validation (`@NotBlank`, `@NotNull`, `@Size`, `@Email`, `@Min`, `@Max`, `@URL`, `@PastOrPresent`) con mensajes en español. Los controladores MVC re-renderizan el formulario con los errores; la API responde `400 Bad Request`. Las restricciones `NOT NULL` de PostgreSQL siguen actuando como última defensa.
 - **Sin migraciones.** El esquema se recrea con `DROP` + `CREATE` en cada arranque.
 - **Subida de imágenes para desarrollo.** `FileStorageService` escribe en `src/main/resources/static/img`; en un JAR empaquetado o en producción conviene sustituirlo por almacenamiento externo.

@@ -1,6 +1,7 @@
 package com.portfolio.my_portfolio.controller.admin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
@@ -44,7 +45,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
   void skillCrudFlow() throws Exception {
     Long personalInfoId = personalInfoId();
 
-    mockMvc.perform(post("/admin/skills")
+    mockMvc.perform(post("/admin/skills").with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("name", "Kotlin Admin")
         .param("levelPercentage", "65")
@@ -60,7 +61,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
         .orElseThrow(() -> new AssertionError("No se creó la habilidad"));
     assertThat(created.getId()).isNotNull();
 
-    mockMvc.perform(post("/admin/skills/{id}", created.getId())
+    mockMvc.perform(post("/admin/skills/{id}", created.getId()).with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("name", "Kotlin Admin 2")
         .param("levelPercentage", "90")
@@ -73,7 +74,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
     assertThat(updated.getName()).isEqualTo("Kotlin Admin 2");
     assertThat(updated.getLevelPercentage()).isEqualTo(90);
 
-    mockMvc.perform(post("/admin/skills/{id}/delete", created.getId()))
+    mockMvc.perform(post("/admin/skills/{id}/delete", created.getId()).with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/admin/skills"));
 
@@ -84,7 +85,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
   void educationCrudFlow() throws Exception {
     Long personalInfoId = personalInfoId();
 
-    mockMvc.perform(post("/admin/educations")
+    mockMvc.perform(post("/admin/educations").with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("degree", "Curso Admin")
         .param("institution", "Academia Admin")
@@ -102,7 +103,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
         .orElseThrow(() -> new AssertionError("No se creó la formación"));
     assertThat(created.getId()).isNotNull();
 
-    mockMvc.perform(post("/admin/educations/{id}", created.getId())
+    mockMvc.perform(post("/admin/educations/{id}", created.getId()).with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("degree", "Curso Admin 2")
         .param("institution", "Academia Admin 2")
@@ -117,7 +118,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
     assertThat(updated.getDegree()).isEqualTo("Curso Admin 2");
     assertThat(updated.getInstitution()).isEqualTo("Academia Admin 2");
 
-    mockMvc.perform(post("/admin/educations/{id}/delete", created.getId()))
+    mockMvc.perform(post("/admin/educations/{id}/delete", created.getId()).with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/admin/educations"));
 
@@ -128,7 +129,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
   void experienceCrudFlow() throws Exception {
     Long personalInfoId = personalInfoId();
 
-    mockMvc.perform(post("/admin/experiences")
+    mockMvc.perform(post("/admin/experiences").with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("jobTitle", "Puesto Admin")
         .param("companyName", "Empresa Admin")
@@ -145,7 +146,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
         .orElseThrow(() -> new AssertionError("No se creó la experiencia"));
     assertThat(created.getId()).isNotNull();
 
-    mockMvc.perform(post("/admin/experiences/{id}", created.getId())
+    mockMvc.perform(post("/admin/experiences/{id}", created.getId()).with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("jobTitle", "Puesto Admin 2")
         .param("companyName", "Empresa Admin 2")
@@ -159,7 +160,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
     assertThat(updated.getJobTitle()).isEqualTo("Puesto Admin 2");
     assertThat(updated.getCompanyName()).isEqualTo("Empresa Admin 2");
 
-    mockMvc.perform(post("/admin/experiences/{id}/delete", created.getId()))
+    mockMvc.perform(post("/admin/experiences/{id}/delete", created.getId()).with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/admin/experiences"));
 
@@ -170,7 +171,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
   void projectCrudFlow() throws Exception {
     Long personalInfoId = personalInfoId();
 
-    mockMvc.perform(multipart("/admin/projects")
+    mockMvc.perform(multipart("/admin/projects").with(csrf())
         .param("title", "Proyecto Admin")
         .param("description", "Descripción de prueba")
         .param("projectUrl", "https://example.com/admin")
@@ -185,7 +186,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
         .orElseThrow(() -> new AssertionError("No se creó el proyecto"));
     assertThat(created.getId()).isNotNull();
 
-    mockMvc.perform(multipart("/admin/projects/{id}", created.getId())
+    mockMvc.perform(multipart("/admin/projects/{id}", created.getId()).with(csrf())
         .param("title", "Proyecto Admin 2")
         .param("description", "Descripción actualizada")
         .param("projectUrl", "https://example.com/admin-2")
@@ -197,7 +198,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
     assertThat(updated.getTitle()).isEqualTo("Proyecto Admin 2");
     assertThat(updated.getProjectUrl()).isEqualTo("https://example.com/admin-2");
 
-    mockMvc.perform(post("/admin/projects/{id}/delete", created.getId()))
+    mockMvc.perform(post("/admin/projects/{id}/delete", created.getId()).with(csrf()))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/admin/projects"));
 
@@ -208,7 +209,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
   void projectCanBeCreatedWithoutImageOrProjectUrl() throws Exception {
     Long personalInfoId = personalInfoId();
 
-    mockMvc.perform(multipart("/admin/projects")
+    mockMvc.perform(multipart("/admin/projects").with(csrf())
         .param("title", "Proyecto sin URL")
         .param("description", "Sin imagen ni URL de proyecto")
         .param("projectUrl", "")
@@ -232,7 +233,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
         .findFirst()
         .orElseThrow(() -> new AssertionError("No hay proyectos sembrados con imagen local"));
 
-    mockMvc.perform(multipart("/admin/projects/{id}", seeded.getId())
+    mockMvc.perform(multipart("/admin/projects/{id}", seeded.getId()).with(csrf())
         .param("title", seeded.getTitle())
         .param("description", seeded.getDescription())
         .param("projectUrl", "https://example.com/seeded")
@@ -248,7 +249,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
 
   @Test
   void personalInfoCanBeUpdated() throws Exception {
-    mockMvc.perform(post("/admin/personal-info")
+    mockMvc.perform(post("/admin/personal-info").with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("firstName", "Admin")
         .param("lastName", "Portfolio")
@@ -276,7 +277,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
     Skill original = skillService.findAll().get(0);
     String originalName = original.getName();
 
-    mockMvc.perform(post("/admin/skills")
+    mockMvc.perform(post("/admin/skills").with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("id", original.getId().toString())
         .param("name", "Habilidad con id manipulado")
@@ -293,7 +294,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
   void validationErrorsReturnTheForm() throws Exception {
     Long personalInfoId = personalInfoId();
 
-    mockMvc.perform(post("/admin/skills")
+    mockMvc.perform(post("/admin/skills").with(csrf())
         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
         .param("name", " ")
         .param("personalInfoId", personalInfoId.toString()))
@@ -306,7 +307,7 @@ class AdminCrudTest extends AdminMvcIntegrationTestSupport {
 
   @Test
   void deletingMissingRecordReturnsNotFound() throws Exception {
-    mockMvc.perform(post("/admin/skills/{id}/delete", 9_999_999L))
+    mockMvc.perform(post("/admin/skills/{id}/delete", 9_999_999L).with(csrf()))
         .andExpect(status().isNotFound());
   }
 
