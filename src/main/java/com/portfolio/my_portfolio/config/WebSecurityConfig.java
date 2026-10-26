@@ -17,7 +17,20 @@ public class WebSecurityConfig {
     http.authorizeHttpRequests(auth -> auth
         .requestMatchers("/admin/**").authenticated()
         .anyRequest().permitAll())
-        .formLogin(form -> form.permitAll());
+        // La API es pública y sin sesión: no hay nada que proteger con CSRF.
+        .csrf(csrf -> csrf.ignoringRequestMatchers("/api/test/**"))
+        .formLogin(form -> form
+            .loginPage("/auth/login")
+            .loginProcessingUrl("/auth/login")
+            .defaultSuccessUrl("/admin")
+            .permitAll())
+        .logout(logout -> logout
+            .logoutUrl("/logout")
+            .invalidateHttpSession(true)
+            .clearAuthentication(true)
+            .deleteCookies("JSESSIONID")
+            .logoutSuccessUrl("/auth/login?logout")
+            .permitAll());
 
     return http.build();
   }
